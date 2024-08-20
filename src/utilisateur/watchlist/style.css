@@ -1,0 +1,322 @@
+.no_scroll {
+    overflow: hidden;
+}
+
+.containerWatchlist h1 {
+    font-family: var(--font-family);
+    color: var(--font-color);
+    text-align: center;
+    margin-top: 3%;
+    margin-bottom: 3%;
+}
+
+/* -------------------- Filtres -------------------- */
+
+.filterContainer {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    margin-left: 5%;
+    margin-bottom: 3%;
+}
+
+.filterContainer input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid white;
+    color: white;
+}
+
+.filterContainer input::placeholder {
+    font-size: 14px;
+}
+
+.filterContainer input:focus::placeholder {
+    color: white;
+    font-size: 16px;
+}
+
+.filterContainer input:focus {
+    outline: none;
+    border-bottom: 1px solid var(--hover-btn);
+    color: white;
+}
+
+.filterContainer select {
+    border-radius: 5px;
+    background-color: var(--bg-grad1);
+    border: none;
+    color: white;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.filterContainer select:focus {
+    outline: none;
+    border: 1px solid var(--border);
+}
+
+/* ------------- Preview -------------------- */
+
+.previewCardContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 90%;
+    margin-left: 5%;
+}
+
+.cardPreviewWatchlist {
+    flex: 0 0 calc(90%/6 -10px);
+    margin: 5px;
+    width: 200px;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+}
+
+
+#watchlistIlluPreview {
+    width: 100%;
+    border-radius: 10px;
+
+}
+
+
+.cardPreviewOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 10px;
+    text-align: center;
+    padding: 10px;
+}
+
+.cardPreviewOverlay h2 {
+    color: var(--hover-btn);
+    font-family: var(--font-family);
+    font-size: 25px;
+}
+
+.cardPreviewWatchlist:hover .cardPreviewOverlay {
+    opacity: 1;
+}
+
+.infoBtn {
+    border: none;
+    background-color: transparent;
+    color: white;
+}
+
+/* ----------------------- popup ---------------------- */
+
+.cardWatchlistOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.cardWatchlist {
+    background: rgb(13, 21, 32);
+    background: linear-gradient(135deg, rgba(13, 21, 32, 0.8) 0%, rgba(27, 83, 123, 0.8) 35%, rgba(194, 243, 255, 0.8) 100%);
+    border: 2px solid var(--bg-grad1);
+    display: flex;
+    margin-top: 5%;
+    width: 90%;
+    margin-left: 5%;
+    border-radius: 16px;
+    box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+}
+
+.cardWatchlist p {
+    margin-top: 2%;
+}
+
+.cardWatchlistBody h2 {
+    font-size: 20px;
+    font-family: var(--font-family);
+    color: var(--hover-btn);
+    text-align: center;
+    margin-top: 15px;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.cardWatchlistInfo {
+    color: white;
+    padding: 15px;
+    font-family: var(--font-family);
+    margin-top: 2%;
+}
+
+.cardWatchlistSyno p {
+    padding: 15px;
+    color: white;
+}
+
+.cardWatchlistTitre {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+}
+
+.cardWatchlistTitre span {
+    margin-left: auto;
+    font-family: var(--font-family);
+    color: white;
+}
+
+.cardWatchlistTitre span svg {
+    align-items: center;
+    color: var(--hover-btn);
+    margin-bottom: 2px;
+}
+
+.cardWatchlistSyno span svg {
+    align-items: center;
+    color: var(--hover-btn);
+    margin-bottom: 2px;
+}
+
+#watchlistIllu {
+    height: 100%;
+    width: 350px;
+    border-radius: 10px 0 0 10px;
+}
+
+.closeButton {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: white;
+}
+
+/* ------------------- Pagination ----------------------- */
+.containerWatchlist nav {
+    display: flex;
+    justify-content: center;
+    padding: 2% 0;
+}
+
+/* ---------------------------Notation -------------------- */
+.custom-rating .MuiRating-iconEmpty {
+    color: transparent;
+    /* Pour éviter les carrés blancs */
+    border: none
+}
+
+.custom-rating .MuiRating-icon {
+    color: grey;
+}
+
+.custom-rating .MuiRating-iconFilled {
+    color: gold;
+}
+
+.custom-rating .MuiRating-iconHover {
+    color: var(--hover-btn);
+}
+
+@media only screen and (max-width : 768px) {
+
+    .containerWatchlist h1 {
+        margin-top: 10%;
+    }
+
+    .filterContainer {
+        margin-top: 5%;
+    }
+
+    .previewCardContainer {
+        margin-top: 10%;
+    }
+
+    .cardPreviewWatchlist {
+        flex: 0 0 calc(90%/2 -10px);
+        width: 150px;
+    }
+
+    /* ----------------------- popup ---------------------- */
+
+
+    .cardWatchlist {
+        display: block;
+        margin-top: 0;
+        height: 100vh;
+        box-shadow: none;
+        background-color: transparent;
+        border: none;
+        position: absolute;
+        overflow: scroll !important;
+    }
+
+    .cardWatchlistTitre {
+        display: block !important;
+    }
+
+    .cardWatchlistTitre p {
+        margin-top: 5%;
+    }
+
+    .cardWatchlistBody h2 {
+        margin-top: 7%;
+        font-size: 30px;
+        text-align: center;
+    }
+
+    #watchlistIllu {
+        height: auto;
+        width: 60%;
+        border-radius: 10px 10px 10px 10px;
+        margin-left: 20%;
+    }
+
+
+    .cardWatchlistOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding-top: 1%;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.829);
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .cardPreviewOverlay h2 {
+        font-size: 15px;
+    }
+
+
+    .closeButton {
+        position: absolute;
+        font-size: 20px;
+        cursor: pointer;
+        color: white;
+        z-index: 9999;
+    }
+
+}

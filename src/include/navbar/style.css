@@ -1,0 +1,321 @@
+nav {
+    display: flex;
+    font-size: 15px;
+    align-items: center;
+    width: 100%;
+    padding: 5px;
+    background-color: var(--bg-navbar);
+    color: var(--font-color);
+}
+
+#containerNav {
+    width: 70%;
+    margin-left: 15%;
+    display: flex;
+}
+
+#logoOrqBlanc {
+    width: 100px;
+}
+
+#navItems {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+}
+
+#navItems span{
+    cursor: pointer;
+}
+
+#navItems span:hover {
+    color: var(--hover-btn) !important;
+}
+
+#navItemsBurger {
+    display: none;
+}
+
+.menuBurger {
+    display: none;
+}
+
+#authNav {
+    display: flex;
+    align-items: center;
+}
+
+#btnNavPasCo,
+.dropdown button {
+    border: none;
+    background-color: var(--bg-grad2);
+    color: var(--bg-font);
+    border-radius: 10px
+}
+
+#btnNavPasCo:hover,
+.dropdown button:hover {
+    color: var(--hover-btn);
+}
+
+#btnNavPasCo {
+    padding: 10% 30%;
+}
+
+#btnNavCo {
+    padding: 2% 60%;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: block;
+    position: absolute;
+    background-color: #0d141fb9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1111;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.dropdown-item {
+    color: var(--font-color);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-item:hover {
+    background-color: var(--font-color);
+    color: black
+}
+
+/* ------------- Modal Connexion --------------------- */
+
+.modalConnexion {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    color: black;
+}
+
+.closeBtnConnexion {
+    position: absolute;
+    top: 20px;
+    right: 125px;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+}
+
+.modalContentConnexion {
+    width: 60%;
+    margin-top: 5%;
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    background-color: var(--bg-grad1);
+    color: var(--font-color);
+    padding: 2%;
+    margin-bottom: 10%;
+}
+
+.modalContentConnexion h1 {
+    margin-bottom: 6%;
+    margin-top: 2%;
+    text-align: center;
+}
+
+.modalContentConnexion form {
+    display: block;
+    justify-content: center;
+}
+
+.modalContentConnexion form input {
+    width: 50%;
+    margin-left: 25%;
+    margin-bottom: 4%;
+    border-radius: 10px;
+    padding: 5px 10px;
+}
+
+.modalContentConnexion label {
+    margin-bottom: 1%;
+
+}
+
+.passwordShowToggle{
+    margin-left: 2%;
+    position: absolute;
+    top: 355px;
+    right: 515px;
+    z-index: 1999;
+    color: black;
+    cursor: pointer;
+}
+
+#btnConnexion {
+    width: fit-content;
+    min-width: 100px;
+    margin-left: 35%;
+    width: 30%;
+    height: 45px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 2.5px solid var(--border);
+    box-shadow: 0px 0px 20px -20px;
+    cursor: pointer;
+    background-color: var(--bg-grad2);
+    transition: all 0.2s ease-in-out 0ms;
+    user-select: none;
+    margin-bottom: 3%;
+    color: var(--font-color);
+}
+
+#btnConnexion:hover {
+    background-color: var(--font-color);
+    box-shadow: 0px 0px 20px -18px;
+    color: var(--bg-grad1);
+}
+
+#btnConnexion:hover {
+    transform: scale(0.95);
+}
+
+.modalContentConnexion .error-message {
+    font-size: 20px;
+}
+
+/* ---------------- Responsive --------------------- */
+
+@media only screen and (max-width : 768px) {
+
+    nav {
+        width: 100%;
+        margin: 0;
+    }
+
+    #containerNav {
+        display: flex;
+        margin: 0;
+        width: 80%;
+    }
+
+    .burgerLogo {
+        display: flex;
+        justify-content: start;
+        margin-left: 5%;
+    }
+
+    #authNav {
+        display: flex;
+        justify-content: end;
+        width: 50%;
+    }
+
+    #navItems {
+        display: none;
+    }
+
+    #navItemsBurger.open {
+        display: block;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background-color: var(--bg-navbar);
+        z-index: 1000;
+        width: 100%;
+        height: 100vh;
+        justify-content: left;
+        font-size: 25px;
+        padding-left: 3%;
+        padding-top: 5%;
+    }
+
+    .navLinkBurger:hover{
+        color:var(--hover-btn)!important;
+        cursor: pointer;
+    }
+    #authNav {
+        margin-right: 0
+    }
+
+    .dropdown-menu {
+        right: 70%;
+    }
+
+    #btnNavPasCo {
+        padding: 10% 30%;
+    }
+
+    #btnNavCo {
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        margin-right: -70px;
+    }
+
+    #usernameNav {
+        display: none;
+    }
+
+    .menuBurger {
+        cursor: pointer;
+        font-size: 30px;
+        color: var(--font-color);
+        margin-left: 2%;
+        display: block;
+    }
+
+    /* ------------- Modal Connexion --------------------- */
+
+    .closeBtnConnexion {
+        top: 95px;
+        right: 20px;
+    }
+
+    .modalContentConnexion {
+        width: 90%;
+    }
+
+    .modalContentConnexion form input {
+        width: 100%;
+        margin-bottom: 4%;
+        border-radius: 10px;
+        padding: 5px 10px;
+    }
+
+    .modalContentConnexion label {
+        margin-bottom: 1%;
+
+    }
+
+    #btnConnexion {
+        margin-top: 5%;
+        margin-bottom: 5%;
+        margin-left: 15%;
+        width: 70%;
+    }
+
+    #btnConnexion:hover {
+        background-color: var(--font-color);
+        box-shadow: 0px 0px 20px -18px;
+        color: var(--bg-grad1);
+    }
+
+    .passwordShowToggle{
+   position: relative;
+}
+}

@@ -1,0 +1,96 @@
+.containerHome{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.containerTitreBtnHome{
+    display: flex;
+    width: 90%;
+    margin-left: 5%;
+    display: flex;
+    justify-content: space-around;
+}
+.titreOrqDiv{
+    align-self: center;
+    margin-bottom: 10%;
+}
+.titreOrqDiv h1{
+    font-size: 100px;
+    color: var(--font-color);
+    font-family: var(--font-family);
+    letter-spacing: 2px;
+}
+
+.btnHomeDiv{
+    align-self: center;
+    width: 40%;
+    margin-bottom: 10%;
+}
+
+.trouverFilmBtn{
+    margin-bottom: 10%;
+    width: 100%;
+}
+
+.trouverSerieBtn{
+    width: 100%;
+}
+
+.btnHomeDiv button{
+    background: var(--btn);
+    border: 1px solid var(--border) ;
+    font-size: 25px;
+    transition: 500ms;
+    border-radius: 5px;
+    padding: 1%;
+    background: linear-gradient(145deg, var(--btnHome), var(--btnHome2));
+    font-family: var(--font-family);
+}
+
+.btnHomeDiv button:hover{
+    box-shadow: 1px 1px 13px rgba(0, 0, 0, 0.3), -1px -1px 13px rgba(255, 255, 255, 0.3);
+    transition: 500ms;
+    padding: 2%;
+}
+
+.btnHomeDiv button:active{
+    box-shadow: 1px 1px 13px rgba(0, 0, 0, 0.3), -1px -1px 13px rgba(255, 255, 255, 0.3);
+    transition: 100ms;
+}
+
+@media only screen and (max-width : 768px) {
+
+    .containerTitreBtnHome{
+        display: block;
+        width: 80%;
+        margin-left: 10%;
+        margin-top: -30%;
+    }
+    .titreOrqDiv{
+        align-self: center;
+        margin-bottom: 15%;
+    }
+    .titreOrqDiv h1{
+        font-size: 70px;
+        letter-spacing: 2px;
+    }
+    
+    .btnHomeDiv{
+        align-self: center;
+        width: 100%;
+        margin-left: -5%;
+        margin-bottom: 0;
+    }
+    
+    .trouverFilmBtn{
+        margin-bottom: 10%;
+        width: 100%;
+    }
+    
+    .trouverSerieBtn{
+        width: 100%;
+    }
+
+}
