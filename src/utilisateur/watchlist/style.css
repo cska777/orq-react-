@@ -56,6 +56,14 @@
     border: 1px solid var(--border);
 }
 
+.filtresVuGenreDiv{
+    display: flex;
+}
+
+#filtreVu{
+    margin-right: 5%;
+}
+
 /* ------------- Preview -------------------- */
 
 .previewCardContainer {
@@ -82,7 +90,6 @@
 
 }
 
-
 .cardPreviewOverlay {
     position: absolute;
     top: 0;
@@ -98,6 +105,21 @@
     border-radius: 10px;
     text-align: center;
     padding: 10px;
+}
+
+.closePreviewDiv{
+    display: flex;
+    justify-content: start;
+}
+
+.closePreviewDiv svg{
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.previewVuDiv svg{
+    font-size: 30px;
+    margin-top:30px;
 }
 
 .cardPreviewOverlay h2 {
@@ -244,6 +266,12 @@
     }
 
     .filterContainer {
+        margin-top: 5%;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .filtresVuGenreDiv{
         margin-top: 5%;
     }
 

@@ -1,7 +1,7 @@
-import { Rating } from '@mui/material'
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect} from 'react'
 import { RiStarFill } from 'react-icons/ri'
+import { IoMdClose } from "react-icons/io";
+
 
 export default function PopupWatchlistDetail({ illustration, titre, press_score, genres, date_sortie, synopsis, onClose ,noteUtilisateur}) {
 
@@ -16,7 +16,7 @@ export default function PopupWatchlistDetail({ illustration, titre, press_score,
     return (
       <div className='cardWatchlistOverlay'>
         <div className='cardWatchlist'>
-          <button className='closeButton' onClick={onClose}>X</button>
+          <button className='closeButton' id="closePreview" onClick={onClose}><IoMdClose/></button>
           <div className='cardWatchlistIllu'>
             <img id='watchlistIllu' src={illustration} alt={`Illustration de ${titre}`} />
           </div>

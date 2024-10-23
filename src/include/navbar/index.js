@@ -3,15 +3,13 @@ import React, { useEffect, useRef, useState } from 'react'
 import "./style.css"
 import logoOrqBlanc from "../../asset/logo/ORQ_blanc.png"
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import axios from "axios"
 import { FaCircleUser, FaBars } from "react-icons/fa6";
 import { Connexion } from "./modalConnexion"
+import { useAppStore } from '../../store'
 
 
 
 export default function Navbar() {
-    const [isAuth, setIsAuth] = useState(false)
-    const [userData, setUserData] = useState(null)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMenuBurgerOpen, setIsMenuBurgerOpen] = useState(false)
     const dropdownRef = useRef(null)
@@ -19,29 +17,19 @@ export default function Navbar() {
     const navigate = useNavigate()
     const location = useLocation()
 
+    // Accéder aux états et actions du store 
+    const isAuth = useAppStore((state) => state.isAuth)
+    const user = useAppStore((state) => state.user)
+    const logout = useAppStore((state) => state.logout)
+    const getUserData = useAppStore((state) => state.getUserData)
+    const token = useAppStore((state) => state.token)
+
     useEffect(() => {
         const token = localStorage.getItem("token")
-        if (token) {
-            axios.get('http://localhost:8000/user/auth/', {
-                headers: {
-                    Authorization: `Token ${token}`
-                }
-            })
-                .then(respone => {
-                    setUserData(respone.data)
-                    setIsAuth(true)
-                })
-                .catch(() => {
-                    setIsAuth(false)
-                })
+        if(token){
+            getUserData(token)
         }
     }, [])
-
-    function logout() {
-        localStorage.removeItem('token')
-        setIsAuth(false)
-        window.location.reload()
-    }
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen)
@@ -107,15 +95,15 @@ export default function Navbar() {
                 <div id='authNav'>
                     {isAuth ? (
                         <div className='dropdown' ref={dropdownRef}>
-                            <button onClick={() => {toggleDropdown(); closeMenuBurger() }}id='btnNavCo'><FaCircleUser /> <span id='usernameNav'>{userData.username}</span></button>
+                            <button onClick={() => {toggleDropdown(); closeMenuBurger() }}id='btnNavCo'><FaCircleUser /> <span id='usernameNav'>{user?.username}</span></button>
                             {isDropdownOpen && (
                                 <div className='dropdown-menu'>
-                                    <Link to="/profil" className='dropdown-item' onClick={dropdownItemClick}>Voir mon profil</Link>
+                                    {/* <Link to="/profil" className='dropdown-item' onClick={dropdownItemClick}>Voir mon profil</Link> */}
                                     <Link to="/watchlist" className='dropdown-item' onClick={dropdownItemClick}>Ma watchlist</Link>
                                     <Link onClick={logout} className='dropdown-item'>Déconnexion</Link>
                                 </div>
                             )}
-                        </div>
+                        </div> 
 
                     ) : (
                         <Connexion />

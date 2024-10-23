@@ -1,46 +1,48 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import "./style.css"
-import { Link } from 'react-router-dom'
-import { FaRegEyeSlash } from "react-icons/fa6";
-import { FaRegEye } from "react-icons/fa6";
-
-
+import axios from 'axios';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import "./style.css";
+import { Link } from 'react-router-dom';
+import { useAppStore } from "../../store"; // Importer le store Zustand
 
 export function Connexion() {
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [errorMessage, setErrorMessage] = useState('')
-    const [isPasswordVisible, setIsPasswordVisible] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const navigate = useNavigate();
 
-    const navigate = useNavigate()
+    // Récupérer l'action getUserData et les états du store Zustand
+    const  getUserData  = useAppStore((state) => state.getUserData)
 
     const handleSubmit = async (event) => {
-        event.preventDefault()
+        event.preventDefault();
 
         try {
-            const response = await axios.post("http://localhost:8000/login/", {
+            const response = await axios.post(`http://localhost:8000/login/`, {
                 email,
                 password,
-            })
+            });
 
-            localStorage.setItem('token', response.data.token)
-            window.location.reload()
+            const token = response.data.token;
+
+            // Stocker le token dans le localStorage et utiliser getUserData pour mettre à jour l'état
+            localStorage.setItem('token', token);
+            getUserData(token); // Utiliser l'action du store pour mettre à jour l'utilisateur et le token
+
+            setIsModalOpen(false);
+            navigate('/');
         } catch (error) {
-            console.log(error)
-            setErrorMessage("Les identifiants saisis sont incorrects.")
+            console.log("Erreur de connexion : ", error);
+            setErrorMessage("Les identifiants saisis sont incorrects.");
         }
-    }
+    };
 
     const toggleModalConnexion = () => {
-        setIsModalOpen(!isModalOpen)
-    }
+        setIsModalOpen(!isModalOpen);
+    };
 
-    const toggleIsPasswordVisible = () => {
-        setIsPasswordVisible(!isPasswordVisible)
-    }
+
     return (
         <div>
             <button id="btnNavPasCo" onClick={toggleModalConnexion}>Connexion</button>
@@ -48,7 +50,7 @@ export function Connexion() {
             {isModalOpen && (
                 <div className='modalConnexion'>
                     <div className='modalContentConnexion'>
-                    <span className='closeBtnConnexion' onClick={toggleModalConnexion}>&times;</span>
+                        <span className='closeBtnConnexion' onClick={toggleModalConnexion}>&times;</span>
                         <h1 className=''>Connexion</h1>
                         {errorMessage && <p className='error-message errorMessage text-danger text-center mb-3'>{errorMessage}</p>}
                         <form onSubmit={handleSubmit} method='POST'>
@@ -60,26 +62,21 @@ export function Connexion() {
                                 onChange={(event) => setEmail(event.target.value)}
                             />
                             <input
-                                type={isPasswordVisible ? "text" : "password"}
+                                type="password"
                                 className=''
                                 placeholder='Mot de passe'
                                 value={password}
                                 onChange={(event) => setPassword(event.target.value)}
                             />
-                            <span className='passwordShowToggle' onClick={toggleIsPasswordVisible}>
-                                {isPasswordVisible ? <FaRegEye/> : <FaRegEyeSlash/>}
-                            </span>
                             <button type='submit' id="btnConnexion">
                                 Se connecter
                             </button>
                             <p>Vous n'avez pas de compte ? <Link onClick={toggleModalConnexion} to="/inscription">Créer un compte</Link></p>
-                            <p>Mot de passe oublié</p>
+                            <p><Link to="/reset_pwd" onClick={toggleModalConnexion}>Mot de passe oublié ?</Link></p>
                         </form>
                     </div>
                 </div>
-
             )}
-
         </div>
-    )
+    );
 }

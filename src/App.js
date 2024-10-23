@@ -8,10 +8,10 @@ import TrouverSerie from './trouverSerie';
 import ParticlesBg from "./ParticlesBg";
 import Profil from './utilisateur/profil';
 import Watchlist from './utilisateur/watchlist';
+import { ResetPassword } from './utilisateur/resetPwd';
 
 
 function App() {
-  const isMobile = window.innerHeight <= 768
   return (
     <Router>
       {<ParticlesBg />}
@@ -31,6 +31,7 @@ function Main() {
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/watchlist" element={<Watchlist />} />
         <Route path="/profil" element={<Profil />} />
+        {/* <Route path="/reset_pwd" element={<ResetPassword />} /> */}
       </Routes>
     </>
   );

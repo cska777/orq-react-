@@ -13,9 +13,9 @@ nav {
     margin-left: 15%;
     display: flex;
 }
-
 #logoOrqBlanc {
     width: 100px;
+    cursor: pointer;
 }
 
 #navItems {
@@ -46,6 +46,10 @@ nav {
     align-items: center;
 }
 
+#btnNavCo{
+    padding: 2px 60px;
+}
+
 #btnNavPasCo,
 .dropdown button {
     border: none;
@@ -61,10 +65,6 @@ nav {
 
 #btnNavPasCo {
     padding: 10% 30%;
-}
-
-#btnNavCo {
-    padding: 2% 60%;
 }
 
 .dropdown {
@@ -110,6 +110,9 @@ nav {
     justify-content: center;
     z-index: 1000;
     color: black;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .closeBtnConnexion {
@@ -154,16 +157,6 @@ nav {
 .modalContentConnexion label {
     margin-bottom: 1%;
 
-}
-
-.passwordShowToggle{
-    margin-left: 2%;
-    position: absolute;
-    top: 355px;
-    right: 515px;
-    z-index: 1999;
-    color: black;
-    cursor: pointer;
 }
 
 #btnConnexion {

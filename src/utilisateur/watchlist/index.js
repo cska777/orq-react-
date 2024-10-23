@@ -1,21 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import "./style.css"
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { RiStarFill } from "react-icons/ri"
 import Pagination from '@mui/material/Pagination'
 import Stack from '@mui/material/Stack'
 import PopupWatchlistDetail from './popupWatchlistDetail'
 import { Rating } from '@mui/material'
+import { useAppStore } from '../../store'
+import { IoMdClose } from 'react-icons/io'
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 
 export default function Watchlist() {
-  const [isAuth, setIsAuth] = useState()
-  const [watchlist, setWatchlist] = useState([])
-  const [userData, setUserData] = useState(null)
+
+  // Utilisation des méthodes et états du store
+  const watchlist = useAppStore((state) => state.watchlist)
+  const getWatchlist = useAppStore((state) => state.getWatchlist)
+  const user = useAppStore((state) => state.user)
+  const getUserData = useAppStore((state) => state.getUserData)
+  const isAuth = useAppStore((state) => state.isAuth)
+  const modifPropWatchlist = useAppStore((state) => state.modifPropWatchlist)
+  const token = useAppStore((state) => state.token)
+  const supprimerWatchlist = useAppStore((state) => state.supprimerWatchlist)
+
   const [itemsParPage] = useState(12)
   const [currentPage, setCurrentPage] = useState(1)
   const [filtreTitre, setFiltreTitre] = useState("")
   const [filtreGenre, setFiltreGenre] = useState("")
+  const [filtreVu, setFiltreVu] = useState("")
   const [genres, setGenres] = useState([])
   const [titres, setTitres] = useState([])
   const [selectedOeuvre, setSelectedOeuvre] = useState(null)
@@ -25,39 +36,22 @@ export default function Watchlist() {
   useEffect(() => {
     const token = localStorage.getItem("token")
     if (token) {
-      axios.get("http://localhost:8000/user/auth/", {
-        headers: {
-          Authorization: `Token ${token}`
-        }
-      }).then(response => {
-        setIsAuth(true)
-        setUserData(response.data)
-        console.log(response.data)
-      }).catch(() => {
-        setIsAuth(false)
-        navigate("/")
-      })
+      getUserData(token)
+
+      if (isAuth) {
+        getWatchlist(token)
+      }
     } else {
-      setIsAuth(false)
       navigate("/")
     }
+  }, [token, navigate, getUserData, getWatchlist, isAuth])
 
-    if (token) {
-      axios.get("http://localhost:8000/watchlist/", {
-        headers: {
-          Authorization: `Token ${token}`
-        }
-      }).then(response => {
-        setWatchlist(response.data)
-        console.log("Watchlist: ", response.data)
-        extractGenres(response.data)
-        extractTitres(response.data)
-      }).catch(() => {
-        console.log("Erreur lors de la récupération de la watchlist")
-      })
+  useEffect(() => {
+    if (watchlist) {
+      extractGenres(watchlist)
+      extractTitres(watchlist)
     }
-  }, [navigate])
-
+  }, [watchlist])
 
   // Change de page
   const handleChange = (event, value) => {
@@ -68,7 +62,7 @@ export default function Watchlist() {
     setter(event.target.value)
     setCurrentPage(1)
   }
-  
+
 
   // Extraction genres unique pour filtre
   const extractGenres = (watchlist) => {
@@ -89,7 +83,8 @@ export default function Watchlist() {
   // Filtrage de la watchlist en fonction des critères
   const filteredWatchlist = watchlist.filter(oeuvre =>
     oeuvre.titre.toLowerCase().includes(filtreTitre.toLowerCase()) &&
-    (filtreGenre === "" || oeuvre.genres.toLowerCase().includes(filtreGenre.toLowerCase()))
+    (filtreGenre === "" || oeuvre.genres.toLowerCase().includes(filtreGenre.toLowerCase())) &&
+    (filtreVu === "" || filtreVu === "vu" && oeuvre.vu || filtreVu === "À voir" && !oeuvre.vu)
   );
 
   // Calcul des éléments à afficher sur la page actuelle
@@ -103,24 +98,32 @@ export default function Watchlist() {
     setSelectedOeuvre(oeuvre)
   }
 
-  const handleNotation = (event, oeuvre) => {
-    const nvlleNote = parseInt(event.target.value)
-    const token = localStorage.getItem("token")
-    if(token){
-      axios.post(`http://localhost:8000/${oeuvre.id}/note_entree_watchlist/`, {note_utilisateur:nvlleNote},{
-        headers:{
-          Authorization : `Token ${token}`
-        }
-      }).then(response => {
-        console.log("Reponse api : " , response.data)
-        setWatchlist(prevWatchlist =>
-          prevWatchlist.map(item => 
-            item.id === oeuvre.id ? {...item,note_utilisateur:nvlleNote} : item
-            )
-          )
-      }).catch(error => {
-        console.log("Erreur lors de l'enregistrement de la note")
-      })
+  // Fonction pour gérer la notation par l'utilisateur
+  const handleNotation = (event, oeuvre, newValue) => {
+    const nvlleNote = newValue
+    if (token) {
+      modifPropWatchlist("note_utilisateur", nvlleNote, oeuvre.id, token)
+    }
+  }
+
+  // Fonction pour supprimer une oeuvre de la watchlist
+  const suppWatchlist = (event, oeuvre) => {
+    event.stopPropagation()
+    const answer = window.confirm(`Voulez vous vraiment supprimer "${oeuvre.titre}" de votre watchlist ?`)
+    if (answer) {
+      if (token) {
+        supprimerWatchlist(token, oeuvre.id)
+      }
+    }
+
+  }
+
+  // Fonction pour modifier la propriété vu
+  const handleVu = (event, oeuvre) => {
+    const newValue = !oeuvre.vu
+    event.stopPropagation()
+    if (token) {
+      modifPropWatchlist("vu", newValue, oeuvre.id, token)
     }
   }
 
@@ -135,17 +138,30 @@ export default function Watchlist() {
           value={filtreTitre}
           onChange={handleFiltreChange(setFiltreTitre)}
         />
+        <div className='filtresVuGenreDiv'>
+          <select
+            value={filtreVu}
+            onChange={handleFiltreChange(setFiltreVu)}
+            id='filtreVu'
+          >
+            <option value="">Vu ?</option>
+            <option value={"vu"}>Vu</option>
+            <option value={"À voir"}>À voir</option>
+          </select>
 
-        <select
-          value={filtreGenre}
-          onChange={handleFiltreChange(setFiltreGenre)}
-          
-        >
-          <option value="">Tous les genres</option>
-          {genres.map((genre, index) => (
-            <option key={index} value={genre}>{genre}</option>
-          ))}
-        </select>
+          <select
+            value={filtreGenre}
+            onChange={handleFiltreChange(setFiltreGenre)}
+            id='filtreGenre'
+          >
+
+            <option value="">Tous les genres</option>
+            {genres.map((genre, index) => (
+              <option key={index} value={genre}>{genre}</option>
+            ))}
+          </select>
+        </div>
+
       </div>
       {filteredWatchlist.length === 0 ? (
         <h2 className="text-center" style={{ color: "var(--hover-btn)" }}>Votre watchlist est vide pour l'instant</h2>
@@ -157,15 +173,31 @@ export default function Watchlist() {
                 <img id='watchlistIlluPreview' src={oeuvre.illustration} alt={`Illustration de ${oeuvre.titre}`} />
               </div>
               <div className="cardPreviewOverlay">
+                <div className='closePreviewDiv'>
+                  <IoMdClose
+                    onClick={(event) => suppWatchlist(event, oeuvre)}
+                  />
+                </div>
                 <h2>{oeuvre.titre}</h2><br></br>
-                <Rating 
-                count={5}
-                onChange={(nvlleNote) => handleNotation(nvlleNote, oeuvre)}
-                size="medium"
-                defaultValue={oeuvre.note_utilisateur || 1}
-                className="custom-rating"
+                <Rating
+                  count={5}
+                  onChange={(event, newValue) => handleNotation(event, oeuvre, newValue)}
+                  size="medium"
+                  defaultValue={oeuvre.note_utilisateur || 0}
+                  className="custom-rating"
                 />
                 <button className='infoBtn'>Plus d'info</button>
+                <div className='previewVuDiv'>
+                  {oeuvre.vu ? (
+                    <FaEyeSlash
+                      onClick={(event) => handleVu(event, oeuvre)}
+                    />
+                  ) : (
+                    <FaEye
+                      onClick={(event) => handleVu(event, oeuvre)}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           ))}

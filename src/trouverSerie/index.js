@@ -58,7 +58,7 @@ export default function TrouverSerie() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      axios.get("http://localhost:8000/watchlist/", {
+      axios.get("https://cska777.pythonanywhere.com/watchlist/", {
         headers: {
           Authorization: `Token ${token}`
         }

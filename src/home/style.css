@@ -1,44 +1,123 @@
-.containerHome{
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.containerHome {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
 }
 
-.containerTitreBtnHome{
-    display: flex;
-    width: 90%;
-    margin-left: 5%;
-    display: flex;
-    justify-content: space-around;
-}
-.titreOrqDiv{
-    align-self: center;
-    margin-bottom: 10%;
-}
-.titreOrqDiv h1{
-    font-size: 100px;
-    color: var(--font-color);
-    font-family: var(--font-family);
-    letter-spacing: 2px;
+.containerTitreCarouHome {
+  width: 80%;
 }
 
-.btnHomeDiv{
-    align-self: center;
-    width: 40%;
-    margin-bottom: 10%;
+.titreOrqDiv {
+  display: flex;
+  justify-content: center;
 }
 
-.trouverFilmBtn{
-    margin-bottom: 10%;
-    width: 100%;
+.titreOrqDiv h1 {
+  font-size: 100px;
+  color: var(--font-color);
+  font-family: var(--font-family);
+  letter-spacing: 2px;
+  display: flex;
+  justify-content: center;
+  margin-top: 5%;
+  text-align: center;
 }
 
-.trouverSerieBtn{
-    width: 100%;
+/* Carousel */
+
+.carouselHome {
+  display: flex;
+  justify-content: center;
+  width: 90%;
+  margin-left: 5%;
+  padding-bottom: 5%;
 }
 
-.btnHomeDiv button{
+.swiper-slide-custom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 250px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+.illuCarouselHome {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Style pour le loader */
+
+.divLoadingHome {
+  display: flex;
+  justify-content: center;
+}
+
+.loader {
+  position: relative;
+  height: 50vh;
+  width: 70%;
+  margin-bottom: 5%;
+  margin-top: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-grad1);
+  overflow: hidden;
+  opacity: 0.5;
+  border: 10px solid var(--bg-grad2);
+  box-shadow: rgba(129, 129, 129, 0.12) 0px 2px 4px 0px, rgba(108, 108, 108, 0.32) 0px 2px 16px 0px;
+  border-radius: 20px;
+}
+
+/* TV Snow Effect */
+.tv-snow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif') repeat;
+  background-size: cover;
+  opacity: 0.8;
+  box-shadow: 0 0 30px 15px var(--bg-grad1);
+}
+
+/* Black bar animation */
+.black-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background-color: var(--bg-grad1);
+  animation: slideDown 3s ease-in-out infinite;
+  box-shadow: 0 0 30px 15px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes slideDown {
+  0% {
+    top: 0;
+  }
+
+  100% {
+    top: 100%;
+  }
+}
+
+
+
+@media only screen and (max-width : 768px) {
+
+  .swiper_custom_mobile .illuCarouHomeMobile{
+    height: 250px;
+  }
+
+  .carouselHome{
+    display: block;
+  }
+
+  .btnHomeMobile{
     background: var(--btn);
     border: 1px solid var(--border) ;
     font-size: 25px;
@@ -47,50 +126,37 @@
     padding: 1%;
     background: linear-gradient(145deg, var(--btnHome), var(--btnHome2));
     font-family: var(--font-family);
-}
+    color: var(--font-color);
+    width: 50%;
+  }
 
-.btnHomeDiv button:hover{
-    box-shadow: 1px 1px 13px rgba(0, 0, 0, 0.3), -1px -1px 13px rgba(255, 255, 255, 0.3);
-    transition: 500ms;
-    padding: 2%;
-}
-
-.btnHomeDiv button:active{
+  .btnHomeMobile:active{
     box-shadow: 1px 1px 13px rgba(0, 0, 0, 0.3), -1px -1px 13px rgba(255, 255, 255, 0.3);
     transition: 100ms;
-}
+  }
 
-@media only screen and (max-width : 768px) {
 
-    .containerTitreBtnHome{
-        display: block;
-        width: 80%;
-        margin-left: 10%;
-        margin-top: -30%;
-    }
-    .titreOrqDiv{
-        align-self: center;
-        margin-bottom: 15%;
-    }
-    .titreOrqDiv h1{
-        font-size: 70px;
-        letter-spacing: 2px;
-    }
-    
-    .btnHomeDiv{
-        align-self: center;
-        width: 100%;
-        margin-left: -5%;
-        margin-bottom: 0;
-    }
-    
-    .trouverFilmBtn{
-        margin-bottom: 10%;
-        width: 100%;
-    }
-    
-    .trouverSerieBtn{
-        width: 100%;
-    }
+  .btnTrouverFilmMobile{
+    padding: 5px 15px;
+    margin-top: 15%;
+    margin-bottom: 5%;
+    border-right: none;
+  }
+
+  .btnTrouverSerieMobile{
+    padding: 5px 10px;
+    border-left: none;
+  }
+
+  .titreOrqDiv {
+    align-self: center;
+    margin-bottom: 15%;
+    margin-top: 10%;
+  }
+
+  .titreOrqDiv h1 {
+    font-size: 50px;
+    letter-spacing: 2px;
+  }
 
 }

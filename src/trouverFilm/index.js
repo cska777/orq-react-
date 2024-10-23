@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import jsonData from '../asset/data/list_films.json'
-import axios from 'axios'
 import { BsChevronDoubleLeft, BsChevronDoubleRight } from "react-icons/bs";
 import { FaRandom } from "react-icons/fa"
 import { RiStarFill } from "react-icons/ri"
 import "./style.css"
 import { FilmDescription } from './popups';
 import PopUpWatchlist from './popUpWatchlist';
+import { useAppStore } from '../store';
+import { useIsMobile } from '../hook/useIsMobile';
 
 
 export default function TrouverFilm() {
   const [films, setFilms] = useState([])
-  const [watchlist, setWatchlist] = useState([])
+  const watchlist = useAppStore((state) => state.watchlist)
+  const getWatchlist = useAppStore((state) => state.getWatchlist)
+  const getUserData = useAppStore((state) => state.getUserData)
+
+  const token = localStorage.getItem("token")
+
   const [historique, setHistorique] = useState([])
 
   const [choixGenre, setChoixGenre] = useState([])
@@ -23,11 +29,11 @@ export default function TrouverFilm() {
   const [noteUnique, setNoteUnique] = useState([])
   const [filmsFiltres, setFilmsFiltres] = useState([])
 
-  const [divVisible, setDivVisible] = useState("divChoixGenre")
+  const [divVisible, setDivVisible] = useState("divChoixFiltres")
+  const [divVisibleMobile, setDivVisibleMobile] = useState("divChoixGenreFilmMobile")
   const [selectedRandomFilm, setSelectedRandomFilm] = useState(null)
 
-  const [userData, setUserData] = useState(null)
-  const [isAuth, setIsAuth] = useState(false)
+  const isMobile = useIsMobile()
 
   const [filtres, setFiltres] = useState({
     genre: [],
@@ -42,45 +48,23 @@ export default function TrouverFilm() {
     return `${hours}h${remainingMinutes.toString().padStart(2, '0')}`;
   }
 
+  useEffect(() => {
+    if (token) {
+      getWatchlist(token) // Récupération de la watchlist 
+      getUserData(token) // Récupération de l'user connecté       
+    }
+  }, [token, getWatchlist, getUserData])
 
   useEffect(() => {
-  // ------------------ Récupération de l'utilisateur connecté ---------------
-    const token = localStorage.getItem("token")
-    if (token) {
-      const response = axios.get("http://localhost:8000/user/auth/", {
-        headers: {
-          Authorization: `Token ${token}`
-        }
-      }).then(response => {
-        setIsAuth(true)
-        setUserData(response.data)
-        console.log(response.data)
-      })
-        .catch(() => {
-          setIsAuth(false)
-        })
-    }
-// ---------------- Récupération Watchlist --------------------------
-    if (token) {
-      axios.get("http://localhost:8000/watchlist/", {
-        headers: {
-          Authorization: `Token ${token}`
-        }
-      }).then(response => {
-        setWatchlist(response.data)
-        console.log("Watchlist :", response.data)
-      }).catch(() => {
-        console.log("Erreur lors de la récupération de la watchlist")
-      })
-    }
+    console.log("Filtres :", filtres)
 
-  // ------------------- Récupération des données ----------------------
+    // ------------------- Récupération des données ----------------------
     setFilms(jsonData)
-  }, [])
+  }, [filtres])
 
 
   useEffect(() => {
-// --------------- Extraction des genres unique ---------------------
+    // --------------- Extraction des genres unique ---------------------
     const extraireGenreUnique = () => {
       const uniqueGenres = []
       for (let film of films) {
@@ -97,7 +81,7 @@ export default function TrouverFilm() {
     if (films.length > 0) {
       extraireGenreUnique()
     }
-// ------------------ Extraction notes unique ----------------------
+    // ------------------ Extraction notes unique ----------------------
     const extraireNoteUnique = () => {
       const uniqueNote = [];
       for (let film of films) {
@@ -114,42 +98,6 @@ export default function TrouverFilm() {
       extraireNoteUnique();
     }
   }, [films])
-
-
-  // ---------------------- Ajouter à la watchlist --------------------------
-  const ajouterWatchlist = async () => {
-    const token = localStorage.getItem("token")
-    const data = {
-      user_id : userData.id,
-      titre : selectedRandomFilm.titre,
-      illustration_url : selectedRandomFilm.poster_url,
-      vu : false,
-      a_regarder_plus_tard : true,
-      type : "film",
-      duree : selectedRandomFilm.duree_minutes,
-      date_sortie : selectedRandomFilm.date_sortie,
-      synopsis : selectedRandomFilm.synopsis,
-      genres : selectedRandomFilm.genres.join(", "),
-      press_score : selectedRandomFilm.note_user
-    }
-
-    if (token) {
-      try {
-        const response = await axios.post("http://localhost:8000/watchlist/",data, {
-          headers : {
-            Authorization : `Token ${token}`
-          }
-        })
-
-        if(response.status === 201 ) {
-          console.log("Film ajouté à la watchlist")
-        }
-
-      } catch (error) {
-        console.error("Erreur lors de l'ajout à la watchlist")
-      }
-    }
-  } 
 
   // ----------------------- Choix genre -----------------------------
   const choisirGenre = (genreSelectionne) => {
@@ -311,7 +259,7 @@ export default function TrouverFilm() {
     }
   }, [filtres, films, watchlist, historique])
 
-  // ------------ Fonctione de sélection aléatoire -----------------
+  // ------------ Fonction de sélection aléatoire -----------------
   const selectRandomFilm = () => {
     if (filmsFiltres.length === 0) {
       return null
@@ -328,175 +276,452 @@ export default function TrouverFilm() {
 
   //---------------------- Navigation choix ----------------------------
   const suivant = () => {
-    if (divVisible === "divChoixGenre") {
-      setDivVisible("divChoixDureeEp")
-    } else if (divVisible === "divChoixDureeEp") {
-      setDivVisible("divChoixDate")
-    } else if (divVisible === "divChoixDate") {
-      setDivVisible("divChoixScore")
-    } else if (divVisible === "divChoixScore") {
+    if (divVisible === "divChoixFiltres") {
       setDivVisible("divFilmPropose")
       selectRandomFilm()
     }
   }
 
   const retour = () => {
-    if (divVisible === "divChoixDureeEp") {
-      setDivVisible("divChoixGenre")
-    } else if (divVisible === "divChoixDate") {
-      setDivVisible("divChoixDureeEp")
-    } else if (divVisible === "divChoixScore") {
-      setDivVisible("divChoixDate")
-    } else if (divVisible === "divFilmPropose") {
-      setDivVisible("divChoixScore")
+    if (divVisible === "divFilmPropose") {
+      setDivVisible("divChoixFiltres")
+      setHistorique([])
     }
 
   }
+
+  // ------------------------- Navigation choix mobile --------------------
+  const suivantMobile = () => {
+    if (divVisibleMobile === "divChoixGenreFilmMobile") {
+      setDivVisibleMobile("divChoixDureeFilmMobile")
+    } else if (divVisibleMobile === "divChoixDureeFilmMobile") {
+      setDivVisibleMobile("divChoixDateFilmMobile")
+    } else if (divVisibleMobile === "divChoixDateFilmMobile") {
+      setDivVisibleMobile("divChoixScoreFilmMobile")
+    } else if (divVisibleMobile === "divChoixScoreFilmMobile") {
+      setDivVisibleMobile("divFilmProposeMobile")
+      selectRandomFilm()
+    }
+  }
+
+  const retourMobile = () => {
+    if (divVisibleMobile === "divChoixDureeFilmMobile") {
+      setDivVisibleMobile("divChoixGenreFilmMobile")
+    } else if (divVisibleMobile === "divChoixDateFilmMobile") {
+      setDivVisibleMobile("divChoixDureeFilmMobile")
+    } else if (divVisibleMobile === "divChoixScoreFilmMobile") {
+      setDivVisibleMobile("divChoixDateFilmMobile")
+    } else if (divVisibleMobile === "divFilmProposeMobile") {
+      setDivVisibleMobile("divChoixScoreFilmMobile")
+    }
+  }
+
   return (
     <div className='containerFindFilm'>
-      {divVisible === "divChoixGenre" && (
-        <div id='divChoixGenre'>
-          {genresUnique.map((genre, index) => {
-            return <button
-              key={index}
-              onClick={() => choisirGenre(genre)}
-              className={`btnChoix ${choixGenre.includes(genre) ? 'selectedFilm' : 'unselected'} `}
-            >{genre}
-            </button>;
-          })}
-          <br></br>
-          <div className='d-flex justify-content-center'>
-            <button onClick={suivant} disabled={choixGenre.length < 1} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
-          </div>
+      {isMobile ? (
+        <div className='mobileChoixFiltres'>
+          {divVisibleMobile === "divChoixGenreFilmMobile" && (
+            <div id='divChoixGenreFilmMobile'>
+              <div className='btnSelecFilmMobile'>
+              {genresUnique.map((genre, index) => {
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => choisirGenre(genre)}
+                        className={`btnChoix ${choixGenre.includes(genre) ? 'selectedFilm' : 'unselected'}`}
+                      >
+                        {genre}
+                      </button>
+                    );
+                  })}
+              </div>
+              <div className='divBtnChoixMobile'>
+                <button onClick={suivantMobile} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
+              </div>
+            </div>
+          )}
+
+          {divVisibleMobile === "divChoixDureeFilmMobile" && (
+            <div id='divChoixDureeFilmMobile'>
+              <div className='btnSelecFilmMobile'>
+              {[{ debut: 0, fin: 89 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDuree(tranche)}
+                      className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Moins de 1h30
+                    </button>
+                  ))}
+                  {[{ debut: 90, fin: 120 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDuree(tranche)}
+                      className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      1h30 - 2h
+                    </button>
+                  ))}
+                  {[{ debut: 121, fin: Infinity }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDuree(tranche)}
+                      className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Plus de 2h
+                    </button>
+                  ))}
+                </div>
+              <div className='divBtnChoixMobile'>
+                <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
+                <button onClick={suivantMobile} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
+              </div>
+            </div>
+          )}
+
+          {divVisibleMobile === "divChoixDateFilmMobile" && (
+            <div id='divChoixDateFilmMobile'>
+              <div className='btnSelecFilmMobile'>
+              {[{ debut: 0, fin: 1979 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Sortie avant 1980
+                    </button>
+                  ))}
+                  {[{ debut: 1980, fin: 1999 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Sortie : 1980 - 1999
+                    </button>
+                  ))}
+                  {[{ debut: 2000, fin: 2009 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Sortie : 2000 - 2009
+                    </button>
+                  ))}
+                  {[{ debut: 2010, fin: 2019 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Sortie : 2010 - 2019
+                    </button>
+                  ))}
+                  {[{ debut: 2020, fin: Infinity }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Sortie après 2019
+                    </button>
+                  ))}
+              </div>
+              <div className='divBtnChoixMobile'>
+                <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
+                <button onClick={suivantMobile} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
+              </div>
+            </div>
+          )}
+
+          {divVisibleMobile === "divChoixScoreFilmMobile" && (
+            <div id='divChoixScoreFilmMobile'>
+              <div className='btnSelecFilmMobile'>
+              {noteUnique.map((note, index) => {
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => choisirNote(note)}
+                        className={`btnChoix ${choixNote.includes(note) ? 'selectedFilm' : 'unselected'}`}
+                      >
+                        {note} <RiStarFill />
+                      </button>
+                    );
+                  })}
+              </div>
+              <div className='divBtnChoixMobile'>
+                <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
+                <button onClick={suivantMobile} className='btnSuivantChoix'> Propose moi un film <BsChevronDoubleRight /> </button>
+              </div>
+            </div>
+          )}
+
+          {divVisibleMobile === "divFilmProposeMobile" && (
+            <div id='divFilmProposeMobile'>
+              {selectedRandomFilm ? (
+                <div className='containerFilmPropose' style={{ "--bg-image": `url(${selectedRandomFilm.poster_url})` }}>
+                  <div className='containerCardInfos'>
+                    <div className='telephoneContainer'>
+                      <div className='movie'>
+                        <div className='movieMenu'>
+                          <PopUpWatchlist selectedFilm={selectedRandomFilm} />
+                        </div>
+                        <div className='movieImg' style={{ "--bg-image-movie": `url(${selectedRandomFilm.poster_url})` }}></div>
+                        <div className='cardInfoText'>
+                          <div className='mr-grid'>
+                            <h1>{selectedRandomFilm.titre}</h1>
+                            <div className='col1 genreDuree'>
+                              <p className='filmCardGenre'>
+                                {selectedRandomFilm.genres.join(", ")}
+                              </p>
+                              {selectedRandomFilm.duree_minutes === null ? (
+                                <p className='dureeCardFilm'>Durée non renseignée</p>
+                              ) : (
+                                <p className='dureeCardFilm'>
+                                  {convertMinutesToHoursMinutes(selectedRandomFilm.duree_minutes)}
+                                </p>
+                              )}
+                              <p className='noteFilmCard'>
+                                {selectedRandomFilm.note_user} <span><RiStarFill /></span>
+                              </p>
+                            </div>
+                            <div className='mr-grid'>
+                              <div className='col1'>
+                                <p className='filmCardDesc'>
+                                  <FilmDescription
+                                    synopsis={selectedRandomFilm.synopsis}
+                                    acteurs={selectedRandomFilm.acteurs}
+                                    realisateur={selectedRandomFilm.realisateur}
+                                  />
+                                </p>
+                              </div>
+                            </div>
+                            <div className='d-flex'>
+                              <div>
+                                <i></i>
+                              </div>
+                              <div className='dateSortieCard'>
+                                Date de sortie : {selectedRandomFilm.date_sortie}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className='noFilmDiv'>Aucun film trouvé avec les filtres sélectionnés.</div>
+              )}
+              <div className='divBtnChoix d-flex justify-content-around'>
+                <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
+                <button onClick={selectRandomFilm} disabled={filmsFiltres.length <= 1} className='btnSuivantChoix'> Propose moi un autre film <FaRandom /></button>
+              </div>
+            </div>
+          )}
         </div>
+      ) : (
+        <>
+          {divVisible === "divChoixFiltres" && (
+
+            <div className='divChoixFiltres'>
+
+              <div id='divChoixGenre' className='divSelecFilm'>
+                <div className='divH2FF'>
+                  <h2>Genres : </h2>
+                  {filtres.genre.length > 0 ? (
+                    <ul>
+                      {filtres.genre.map((genre, index) => {
+                        return <li key={index} >{genre}</li>
+                      })}
+                    </ul>
+                  ) : (
+                    <p>Selectionnez un ou plusieurs filtres </p>
+                  )}
+                </div>
+                <div className='divBtnSelecFilm'>
+                  {genresUnique.map((genre, index) => {
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => choisirGenre(genre)}
+                        className={`btnChoix ${choixGenre.includes(genre) ? 'selectedFilm' : 'unselected'}`}
+                      >
+                        {genre}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div id='divChoixDureeEp' className='divSelecFilm'>
+                <div className='divH2FF'>
+                  <h2>Duree : </h2>
+                  {filtres.duree.length > 0 ? (
+                    <ul>
+                      {filtres.duree.map((duree, index) => {
+                        return (
+                          <li key={index}>
+                            {duree.debut === 0 ? "Moins de 1h30" :
+                              duree.debut === 90 ? "1h30 - 2H" :
+                                duree.debut === 121 ? "Plus de 2h" :
+                                  ""}
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  ) : (
+                    <p>Selectionnez un ou plusieurs filtres</p>
+                  )}
+                </div>
+                <div className='divBtnSelecFilm'>
+                  {[{ debut: 0, fin: 89 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDuree(tranche)}
+                      className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Moins de 1h30
+                    </button>
+                  ))}
+                  {[{ debut: 90, fin: 120 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDuree(tranche)}
+                      className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      1h30 - 2h
+                    </button>
+                  ))}
+                  {[{ debut: 121, fin: Infinity }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDuree(tranche)}
+                      className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Plus de 2h
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div id='divChoixDate' className='divSelecFilm'>
+                <div className='divH2FF'>
+                  <h2>Date de sortie : </h2>
+                  {filtres.dateSortie.length > 0 ? (
+                    <ul>
+                      {filtres.dateSortie.map((dateSortie, index) => {
+                        return (
+                          <li key={index}>
+                            {
+                              dateSortie.debut === 0 ? "Sortie avant 1980" :
+                                dateSortie.debut === 1980 ? "Date de sortie entre 1980 et 1999" :
+                                  dateSortie.debut === 2000 ? "Date de sortie entre 2000 et 2009" :
+                                    dateSortie.debut === 2010 ? "Date de sortie entre 2010 et 2019" :
+                                      dateSortie.debut === 2020 ? "Sortie après 2019" :
+                                        ""
+                            }
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  ) : (
+                    <p>Selectionnez un ou plusieurs filtres</p>
+                  )}
+                </div>
+                <div className='divBtnSelecFilm'>
+                  {[{ debut: 0, fin: 1979 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Sortie avant 1980
+                    </button>
+                  ))}
+                  {[{ debut: 1980, fin: 1999 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Sortie : 1980 - 1999
+                    </button>
+                  ))}
+                  {[{ debut: 2000, fin: 2009 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Sortie : 2000 - 2009
+                    </button>
+                  ))}
+                  {[{ debut: 2010, fin: 2019 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Sortie : 2010 - 2019
+                    </button>
+                  ))}
+                  {[{ debut: 2020, fin: Infinity }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      Sortie après 2019
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div id='divChoixScore' className='divSelecFilm'>
+                <div className='divH2FF'>
+                  <h2>Note : </h2>
+                  {filtres.note.length > 0 ? (
+                    <ul>
+                      {filtres.note.map((note, index) => {
+                        return <li key={index}> {note} <RiStarFill /> </li>
+                      })}
+                    </ul>
+                  ) : (
+                    <p>Selectionnez un ou plusieurs filtres</p>
+                  )}
+                </div>
+                <div className='divBtnSelecFilm'>
+                  {noteUnique.map((note, index) => {
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => choisirNote(note)}
+                        className={`btnChoix ${choixNote.includes(note) ? 'selectedFilm' : 'unselected'}`}
+                      >
+                        {note} <RiStarFill />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className='divBtnChoix d-flex justify-content-around'>
+                <button onClick={suivant} className='btnSuivantChoix fixedBtn'> Propose moi un film <BsChevronDoubleRight /> </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
-
-      {divVisible === "divChoixDureeEp" && (
-        <div id='divChoixDureeEp'>
-          <div className='d-flex justify-content-center'>
-            {[{ debut: 0, fin: 89 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDuree(tranche)}
-                className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-              >
-                Moins de 1h30
-              </button>
-            ))}
-            {[{ debut: 90, fin: 120 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDuree(tranche)}
-                className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-              >
-                1h30 - 2h
-              </button>
-            ))}
-            {[{ debut: 121, fin: Infinity }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDuree(tranche)}
-                className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-              >
-                Plus de 2h
-              </button>
-            ))}
-          </div>
-          <div className='divBtnChoix d-flex justify-content-around'>
-            <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour  </button>
-            <button onClick={suivant} disabled={choixDuree.length < 1} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
-          </div>
-        </div>
-      )}
-
-      {divVisible === "divChoixDate" && (
-        <div id='divChoixDate'>
-          <div className='d-flex justify-content-center'>
-            {[{ debut: 0, fin: 1979 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDate(tranche)}
-                className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-              >
-                Sortie avant 1980
-              </button>
-            ))}
-            {[{ debut: 1980, fin: 1999 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDate(tranche)}
-                className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-              >
-                Sortie : 1980 - 1999
-              </button>
-            ))}
-            {[{ debut: 2000, fin: 2009 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDate(tranche)}
-                className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-              >
-                Sortie : 2000 - 2009
-              </button>
-            ))}
-            {[{ debut: 2010, fin: 2019 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDate(tranche)}
-                className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-              >
-                Sortie : 2010 - 2019
-              </button>
-            ))}
-            {[{ debut: 2020, fin: Infinity }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDate(tranche)}
-                className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-              >
-                Sortie après 2019
-              </button>
-            ))}
-          </div>
-          <div className='divBtnChoix d-flex justify-content-around'>
-            <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour  </button>
-            <button onClick={suivant} disabled={choixDateSortie.length < 1} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
-          </div>
-        </div>
-      )}
-
-      {divVisible === "divChoixScore" && (
-        <div id='divChoixScore'>
-          <div className='d-flex justify-content-center'>
-            {noteUnique.map((note, index) => {
-              return (
-                <button
-                  key={index}
-                  onClick={() => choisirNote(note)}
-                  className={`btnChoix ${choixNote.includes(note) ? 'selectedFilm' : 'unselected'}`}
-                >
-                  {note} <RiStarFill />
-                </button>
-              )
-            })}
-          </div>
-          <div className='divBtnChoix d-flex justify-content-around'>
-            <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour  </button>
-            <button onClick={suivant} disabled={choixNote.length < 1} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
-          </div>
-
-        </div>
-      )}
-
       {divVisible === "divFilmPropose" && (
-        <div id='divFilmProposee'>
+        <div id='divFilmPropose'>
           {selectedRandomFilm ? (
             <div className='containerFilmPropose' style={{ "--bg-image": `url(${selectedRandomFilm.poster_url})` }}>
               <div className='containerCardInfos'>
                 <div className='telephoneContainer'>
                   <div className='movie'>
                     <div className='movieMenu'>
-                    <PopUpWatchlist selectedFilm={selectedRandomFilm}></PopUpWatchlist>
+                      <PopUpWatchlist selectedFilm={selectedRandomFilm} />
                     </div>
                     <div className='movieImg' style={{ "--bg-image-movie": `url(${selectedRandomFilm.poster_url})` }}></div>
                     <div className='cardInfoText'>
@@ -507,18 +732,24 @@ export default function TrouverFilm() {
                             {selectedRandomFilm.genres.join(", ")}
                           </p>
                           {selectedRandomFilm.duree_minutes === null ? (
-                            <p className='dureeCardFilm'>
-                              Durée non renseigné</p>
+                            <p className='dureeCardFilm'>Durée non renseignée</p>
                           ) : (
                             <p className='dureeCardFilm'>
-                              {convertMinutesToHoursMinutes(selectedRandomFilm.duree_minutes)}</p>
+                              {convertMinutesToHoursMinutes(selectedRandomFilm.duree_minutes)}
+                            </p>
                           )}
-                          <p className='noteFilmCard'>{selectedRandomFilm.note_user} <span> <RiStarFill /></span></p>
+                          <p className='noteFilmCard'>
+                            {selectedRandomFilm.note_user} <span><RiStarFill /></span>
+                          </p>
                         </div>
                         <div className='mr-grid'>
                           <div className='col1'>
                             <p className='filmCardDesc'>
-                              <FilmDescription synopsis={selectedRandomFilm.synopsis} acteurs={selectedRandomFilm.acteurs} realisateur={selectedRandomFilm.realisateur} />
+                              <FilmDescription
+                                synopsis={selectedRandomFilm.synopsis}
+                                acteurs={selectedRandomFilm.acteurs}
+                                realisateur={selectedRandomFilm.realisateur}
+                              />
                             </p>
                           </div>
                         </div>
@@ -537,16 +768,16 @@ export default function TrouverFilm() {
               </div>
             </div>
           ) : (
-            <div className='text-center'>Aucun film trouvé avec les filtres sélectionnés.</div>
+            <div className='noFilmDiv'>Aucun film trouvé avec les filtres sélectionnés.</div>
           )}
           <div className='divBtnChoix d-flex justify-content-around'>
-            <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour  </button>
-            <button onClick={selectRandomFilm} disabled={filmsFiltres.length <= 1} className='btnSuivantChoix'> Propose moi un autre film <FaRandom /> </button>
+            <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
+            <button onClick={selectRandomFilm} disabled={filmsFiltres.length <= 1} className='btnSuivantChoix'> Propose moi un autre film <FaRandom /></button>
           </div>
         </div>
       )}
     </div>
+  );
 
-  )
 }
 
