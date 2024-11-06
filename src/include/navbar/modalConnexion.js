@@ -56,14 +56,14 @@ export function Connexion() {
                         <form onSubmit={handleSubmit} method='POST'>
                             <input
                                 type='email'
-                                className=''
+                                className='inputCo'
                                 placeholder='Adresse email'
                                 value={email}
                                 onChange={(event) => setEmail(event.target.value)}
                             />
                             <input
                                 type="password"
-                                className=''
+                                className='inputCo'
                                 placeholder='Mot de passe'
                                 value={password}
                                 onChange={(event) => setPassword(event.target.value)}
@@ -71,8 +71,8 @@ export function Connexion() {
                             <button type='submit' id="btnConnexion">
                                 Se connecter
                             </button>
-                            <p>Vous n'avez pas de compte ? <Link onClick={toggleModalConnexion} to="/inscription">Créer un compte</Link></p>
-                            <p><Link to="/reset_pwd" onClick={toggleModalConnexion}>Mot de passe oublié ?</Link></p>
+                            <p className='text-center'>Vous ne possédez pas de compte ? <br></br> <Link onClick={toggleModalConnexion} to="/inscription">Créer un compte</Link></p>
+                            {/* <p><Link to="/reset_pwd" onClick={toggleModalConnexion}>Mot de passe oublié ?</Link></p> */}
                         </form>
                     </div>
                 </div>
