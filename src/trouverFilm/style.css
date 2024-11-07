@@ -13,7 +13,7 @@
 }
 
 button{
-    color: black!important;
+    color: black;
 }
 .selectedFilm {
     border: 5px solid var(--bg-grad1) !important;
