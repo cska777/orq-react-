@@ -49,7 +49,7 @@ export default function Home() {
               <motion.p
                 variants={itemVariants}
               >
-                REGARDE
+                 REGARDE
               </motion.p>
               <motion.p
                 variants={itemVariants}
