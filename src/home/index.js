@@ -77,7 +77,7 @@ export default function Home() {
                 <>
                   <CarouselHomeMobile />
                   <div className="divButtonHomeMobile">
-                    <Link to={"/trouverFilm"}><button className='btnTrouverFilmMobile btnHomeMobile'>Trouver mon film</button></Link>
+                    <Link to={"/trouverFilm"}><button className='btnTrouverFilmMobile btnHomeMobile'>Trouver mon film</button></Link><br></br>
                     <Link to={"/trouverSerie"}><button className='btnTrouverSerieMobile btnHomeMobile'>Trouver ma série</button></Link>
                   </div>
                 </>

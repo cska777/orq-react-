@@ -127,7 +127,7 @@
     background: linear-gradient(145deg, var(--btnHome), var(--btnHome2));
     font-family: var(--font-family);
     color: var(--font-color);
-    width: 50%;
+    width: 100%;
   }
 
   .btnHomeMobile:active{

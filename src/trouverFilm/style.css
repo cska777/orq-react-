@@ -12,9 +12,6 @@
     margin-left: 5%;
 }
 
-button{
-    color: black;
-}
 .selectedFilm {
     border: 5px solid var(--bg-grad1) !important;
     transform: scale(1.1);
