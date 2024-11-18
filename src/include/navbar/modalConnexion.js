@@ -5,6 +5,11 @@ import "./style.css";
 import { Link } from 'react-router-dom';
 import { useAppStore } from "../../store"; // Importer le store Zustand
 
+const API_URL =
+process.env.NODE_ENV === "development"
+? process.env.REACT_APP_BACKEND_URL_DEV
+: process.env.REACT_APP_BACKEND_URL_PROD
+
 export function Connexion() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [email, setEmail] = useState('');
@@ -19,7 +24,7 @@ export function Connexion() {
         event.preventDefault();
 
         try {
-            const response = await axios.post(`http://localhost:8000/login/`, {
+            const response = await axios.post(`${API_URL}/login/`, {
                 email,
                 password,
             });

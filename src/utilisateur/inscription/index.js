@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import "./style.css"
 import axios from "axios"
-import {Link, useNavigate} from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 
+const API_URL =
+process.env.NODE_ENV === "development"
+? process.env.REACT_APP_BACKEND_URL_DEV
+: process.env.REACT_APP_BACKEND_URL_PROD
 
 export default function Inscription() {
     const [username, setUsername] = useState('')
@@ -71,7 +75,7 @@ export default function Inscription() {
         }
 
             try{
-            const response = await axios.post("http://localhost:8000/signup/",{
+            const response = await axios.post(`${API_URL}/signup/`,{
                 username,
                 email,
                 password,

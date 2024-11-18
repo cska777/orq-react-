@@ -1,6 +1,10 @@
 import axios from "axios";
 import { create } from "zustand";
 
+const API_URL =
+process.env.NODE_ENV === "development"
+? process.env.REACT_APP_BACKEND_URL_DEV
+: process.env.REACT_APP_BACKEND_URL_PROD
 
 export const useAppStore = create((set) => ({
     // Gestion de l'user
@@ -13,7 +17,7 @@ export const useAppStore = create((set) => ({
     getWatchlist: async (token) => {
         if (token) {
             try {
-                const response = await axios.get("http://localhost:8000/watchlist/", {
+                const response = await axios.get(`${API_URL}/watchlist/`, {
                     headers: {
                         Authorization: `Token ${token}`
                     }
@@ -52,7 +56,7 @@ export const useAppStore = create((set) => ({
 
         if (token) {
             try {
-                const response = await axios.post("http://localhost:8000/watchlist/", data, {
+                const response = await axios.post(`${API_URL}/watchlist/`, data, {
                     headers: {
                         Authorization: `Token ${token}`
                     }
@@ -77,7 +81,7 @@ export const useAppStore = create((set) => ({
     supprimerWatchlist: async (token, itemId) => {
         if (token) {
             try {
-                const response = await axios.delete(`http://localhost:8000/watchlist/${itemId}/`, {
+                const response = await axios.delete(`${API_URL}/watchlist/${itemId}/`, {
                     headers: {
                         Authorization: `Token ${token}`
                     }
@@ -107,7 +111,7 @@ export const useAppStore = create((set) => ({
                 const data = { [propriete]: nvlleValeur }
                 console.log("Data Watchlist modif",data)
 
-                const response = await axios.patch(`http://localhost:8000/watchlist/${itemId}/`, data, {
+                const response = await axios.patch(`${API_URL}/watchlist/${itemId}/`, data, {
                     headers: {
                         Authorization: `Token ${token}`
                     }
@@ -137,7 +141,7 @@ export const useAppStore = create((set) => ({
     getUserData: async (token) => {
         if (token) {
             try {
-                const response = await axios.get("http://localhost:8000/user/auth/", {
+                const response = await axios.get(`${API_URL}/user/auth/`, {
                     headers: {
                         Authorization: `Token ${token}`
                     }

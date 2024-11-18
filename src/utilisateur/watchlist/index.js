@@ -66,12 +66,14 @@ export default function Watchlist() {
 
   // Extraction genres unique pour filtre
   const extractGenres = (watchlist) => {
-    const genresSet = new Set()
+    const genresSet = new Set();
     watchlist.forEach(oeuvre => {
-      oeuvre.genres.split(",").forEach(genre => genresSet.add(genre.trim()))
-    })
-    setGenres([...genresSet])
-    console.log("Genres :", genres)
+      // Vérifier que `oeuvre.genres` est bien une chaîne non vide avant d'appeler `.split`
+      if (typeof oeuvre.genres === "string" && oeuvre.genres.trim() !== "") {
+        oeuvre.genres.split(",").forEach(genre => genresSet.add(genre.trim()));
+      }
+    });
+    return [...genresSet];
   }
 
   // Extraction des titres pour proposition dynamique de la recherche
