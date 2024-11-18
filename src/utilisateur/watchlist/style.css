@@ -125,7 +125,7 @@
 .cardPreviewOverlay h2 {
     color: var(--hover-btn);
     font-family: var(--font-family);
-    font-size: 25px;
+    font-size: 20px;
 }
 
 .cardPreviewWatchlist:hover .cardPreviewOverlay {
@@ -308,7 +308,7 @@
 
     .cardWatchlistBody h2 {
         margin-top: 7%;
-        font-size: 25px;
+        font-size: 30px;
         text-align: center;
     }
 
