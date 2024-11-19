@@ -55,6 +55,7 @@ export default function TrouverFilm() {
     }
   }, [token, getWatchlist, getUserData])
 
+  
   useEffect(() => {
     console.log("Filtres :", filtres)
 

@@ -7,6 +7,7 @@ process.env.NODE_ENV === "development"
 : process.env.REACT_APP_BACKEND_URL_PROD
 
 export const useAppStore = create((set) => ({
+    
     // Gestion de l'user
     user: null,
     token: null,

@@ -36,8 +36,8 @@
     "zustand": "^5.0.0-rc.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "REACT_APP_BACKEND_URL_DEV=http://localhost:8000 react-scripts start",
+    "build": "REACT_APP_BACKEND_URL_PROD=https://orq-django-production.up.railway.app react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy" : "npm run build",
