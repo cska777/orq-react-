@@ -25,7 +25,7 @@ export default function TrouverFilm() {
   const [choixNote, setChoixNote] = useState([])
   const [choixDuree, setChoixDuree] = useState([])
 
-  const [genresUnique, setGenreUnique] = useState([])
+  const [genresUnique, setGenresUnique] = useState([])
   const [noteUnique, setNoteUnique] = useState([])
   const [filmsFiltres, setFilmsFiltres] = useState([])
 
@@ -55,7 +55,6 @@ export default function TrouverFilm() {
     }
   }, [token, getWatchlist, getUserData])
 
-  
   useEffect(() => {
     console.log("Filtres :", filtres)
 
@@ -77,7 +76,7 @@ export default function TrouverFilm() {
           }
         }
       }
-      setGenreUnique(uniqueGenres)
+      setGenresUnique(uniqueGenres)
     }
     if (films.length > 0) {
       extraireGenreUnique()
@@ -489,13 +488,13 @@ export default function TrouverFilm() {
                             </div>
                             <div className='mr-grid'>
                               <div className='col1'>
-                                <p className='filmCardDesc'>
+                                <div className='filmCardDesc'>
                                   <FilmDescription
                                     synopsis={selectedRandomFilm.synopsis}
                                     acteurs={selectedRandomFilm.acteurs}
                                     realisateur={selectedRandomFilm.realisateur}
                                   />
-                                </p>
+                                </div>
                               </div>
                             </div>
                             <div className='d-flex'>
@@ -745,13 +744,13 @@ export default function TrouverFilm() {
                         </div>
                         <div className='mr-grid'>
                           <div className='col1'>
-                            <p className='filmCardDesc'>
+                            <div className='filmCardDesc'>
                               <FilmDescription
                                 synopsis={selectedRandomFilm.synopsis}
                                 acteurs={selectedRandomFilm.acteurs}
                                 realisateur={selectedRandomFilm.realisateur}
                               />
-                            </p>
+                            </div>
                           </div>
                         </div>
                         <div className='d-flex'>

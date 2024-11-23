@@ -38,48 +38,94 @@ export const useAppStore = create((set) => ({
         watchlist: [...state.watchlist, newItem]
     })),
 
-    // Ajouter un film à la watchlist
-    ajouterWatchlist: async (selectedRandomFilm, userData, token) => {
-
-        const data = {
-            user_id: userData.id,
-            titre: selectedRandomFilm.titre,
-            illustration: selectedRandomFilm.poster_url,
-            vu: false,
-            a_regarder_plus_tard: true,
-            type: "film",
-            duree: selectedRandomFilm.duree_minutes,
-            date_sortie: selectedRandomFilm.date_sortie,
-            synopsis: selectedRandomFilm.synopsis,
-            genres: selectedRandomFilm.genres.join(", "),
-            press_score: selectedRandomFilm.note_user
-        }
-
+    // Ajouter une oeuvre à la watchlist
+    ajouterWatchlist: async (item, userData, token) => {
+        // Déterminer le type automatiquement
+        const type = item.nb_saison ? "série" : "film";
+    
+        const data = type === "film"
+            ? {
+                user_id: userData.id,
+                titre: item.titre,
+                illustration: item.poster_url,
+                vu: false,
+                a_regarder_plus_tard: true,
+                type: "film",
+                duree: item.duree_minutes,
+                date_sortie: item.date_sortie,
+                synopsis: item.synopsis,
+                genres: item.genres.join(", "),
+                press_score: item.note_user
+            }
+            : {
+                user_id: userData.id,
+                titre: item.titre,
+                illustration: item.poster_url,
+                vu: false,
+                a_regarder_plus_tard: true,
+                type: "série",
+                date_sortie: item.date_sortie,
+                nb_saison: item.nbSaison,
+                synopsis: item.synopsis,
+                genres: item.genres.join(", "),
+                realisateur: item.realisateur.join(", "),
+                acteurs: item.acteurs.join(", "),
+                press_score: item.note_user
+            };
+    
         if (token) {
             try {
                 const response = await axios.post(`${API_URL}/watchlist/`, data, {
                     headers: {
                         Authorization: `Token ${token}`
                     }
-                })
-
+                });
+    
                 if (response.status === 201) {
-                    // MAJ de la watchlist dans Zuustand après succès
+                    // Mise à jour de la watchlist
                     set((state) => ({
                         watchlist: [...state.watchlist, response.data]
-                    }))
-                    console.log("Film ajouté à la watchlist avec succès")
+                    }));
+                    console.log(`${type.charAt(0).toUpperCase() + type.slice(1)} ajouté à la watchlist avec succès`);
                 }
-
             } catch (error) {
-                console.error("Erreur lors de l'ajout à la watchlist")
+                console.error(`Erreur lors de l'ajout du ${type} à la watchlist`, error.response ? error.response.data : error.message);
             }
         }
-
     },
+    
+    
 
-    // Supprimer un film de la watchlist
-    supprimerWatchlist: async (token, itemId) => {
+    // Modifier propriété de la watchlist 
+    modifPropWatchlist: async (propriete, nvlleValeur, itemId, token) => {
+        if (token) {
+            try {
+                const data = { [propriete]: nvlleValeur };
+    
+                const response = await axios.patch(`${API_URL}/watchlist/${itemId}/`, data, {
+                    headers: {
+                        Authorization: `Token ${token}`
+                    }
+                });
+    
+                if (response.status === 200) {
+                    set((state) => ({
+                        watchlist: state.watchlist.map(item =>
+                            item.id === itemId ? { ...item, [propriete]: nvlleValeur } : item
+                        )
+                    }));
+                    console.log("Propriété mise à jour avec succès");
+                }
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour de la propriété de la watchlist", error.response ? error.response.data : error.message);
+            }
+        } else {
+            console.error("Token non fourni, impossible de mettre à jour la watchlist");
+        }
+    },
+    
+     // Supprimer une oeuvre de la watchlist
+     supprimerWatchlist: async (token, itemId) => {
         if (token) {
             try {
                 const response = await axios.delete(`${API_URL}/watchlist/${itemId}/`, {
@@ -104,39 +150,6 @@ export const useAppStore = create((set) => ({
             console.error("Token non fourni, impossible de supprimer de la watchlist");
         }
     },
-
-    // Modifier propriété de la watchlist 
-    modifPropWatchlist: async (propriete, nvlleValeur, itemId, token) => {
-        if (token) {
-            try {
-                const data = { [propriete]: nvlleValeur }
-                console.log("Data Watchlist modif",data)
-
-                const response = await axios.patch(`${API_URL}/watchlist/${itemId}/`, data, {
-                    headers: {
-                        Authorization: `Token ${token}`
-                    }
-                })
-                console.log("Response Watchlist modif",response)
-                if (response.status === 200) {
-                    set((state) => ({
-                        watchlist: state.watchlist.map(item =>
-                            item.id === itemId ? { ...item, [propriete]: nvlleValeur } : item
-                        )
-                    }))
-                    console.log("Propriété mise à jour avec succès")
-                } else {
-                    console.error(`Erreur inatendue lors de la mise à jour de la watchlist, code de statut : ${response.status}`)
-                }
-            } catch (error) {
-                console.error("Erreur lors de la mise à jour de la propriété de l'oeuvre dans la watchlist", error.response ? error.response.data : error.message);
-            }
-        } else {
-            console.error("Token non fourni, impossible de mettre à jour la watchlist");
-        }
-    },
-
-
 
     // Récupération de l'user connecté
     getUserData: async (token) => {

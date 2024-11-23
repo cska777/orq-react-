@@ -1,218 +1,337 @@
-.containerFindSerie{
-    margin: 5%;
-}
-.selectedSerie {
-    border: 5px solid #FFC53D !important;
-    transform: scale(1.1);
-    background-color: #646464;
-    color: white;
+.containerFindSerie {
+  margin: 5%;
+  display: flex;
+  flex-wrap: wrap;
+ justify-content: center;
+  box-sizing: border-box;
 }
 
+.divChoixFiltres {
+  display: flex;
+  width: 90%;
+  margin-left: 5%;
+}
+
+.selectedSerie {
+  border: 5px solid var(--bg-grad1) !important;
+  transform: scale(1.1);
+  background-color: var(--btn-bg);
+  color: var(--font-color);
+}
+
+.containerFindSerie h2 {
+  color: var(--font-color);
+  margin-top: 3%;
+  font-family: var(--font-family);
+}
+
+.divH2FF {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  text-align: center;
+  width: 100%;
+}
+
+.divSelecSerie {
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  flex: 1 1 25%;
+  overflow: scroll;
+  height: calc(50vw);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.divSelecSerie p {
+  color: white;
+}
+
+.divSelecSerie ul {
+  padding: 0;
+  list-style-type: none;
+  color: white;
+}
+
+.divSelecSerie:nth-last-child(-n+4) {
+  margin-left: 1%;
+}
+
+.divBtnSelecSerie:nth-last-child {
+  margin-right: 1%;
+}
+
+.divBtnSelecSerie {
+  display: none;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.divSelecSerie:hover .divBtnSelecSerie {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+#divChoixGenre.divSelecSerie:hover .divBtnSelecSerie {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centrer les boutons horizontalement */
+  gap: 0px; /* Ajustez l'espacement entre les boutons */
+  overflow-y: auto; /* Activer le scroll si le contenu déborde */
+  max-height: 100%;
+}
+
+
+.divSelecSerie:hover {
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+  backdrop-filter: none;
+}
+
+.divSelecSerie:hover .divH2FF {
+  display: none;
+}
 
 /* ------------------ Bouton Choix -------------------- */
-.btnChoixSerie {
-    display: inline-block;
-    padding: 10px 22px;
-    border: 1px solid #4f4f4f;
-    border-radius: 4px;
-    transition: all 0.2s ease-in;
-    position: relative;
-    overflow: hidden;
-    font-size: 14px;
-    cursor: pointer;
-    z-index: 1;
-    margin: 1%;
-  }
-  
-  .btnChoixSerie:before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%) scaleY(1) scaleX(1.25);
-    top: 100%;
-    width: 140%;
-    height: 180%;
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 50%;
-    display: block;
-    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
-    z-index: -1;
-  }
-  
-  .btnChoixSerie:after {
-    content: "";
-    position: absolute;
-    left: 55%;
-    transform: translateX(-50%) scaleY(1) scaleX(1.45);
-    top: 180%;
-    width: 160%;
-    height: 190%;
-    background-color: #838383;
-    border-radius: 50%;
-    display: block;
-    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
-    z-index: -1;
-  }
-  
-  .btnChoixSerie:hover {
-    color: #ffffff;
-    border: 1px solid black;
-  }
-  
-  .btnChoixSerie:hover:before {
-    top: -35%;
-    background-color: black;
-    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
-  }
-  
-  .btnChoixSerie:hover:after {
-    top: -45%;
-    background-color: black;
-    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
-  }
-  
-/* -------------------- Bouton Suivant -------------------------- */
-  .btnSuivantChoixSerie{
-    display: inline-block;
-    padding: 10px 22px;
-    border: 1px solid #4f4f4f;
-    border-radius: 4px;
-    transition: all 0.2s ease-in;
-    position: relative;
-    overflow: hidden;
-    font-size: 14px;
-    cursor: pointer;
-    z-index: 1;
-    margin: 1%;
-    width: 40%;
-    margin-top: 5%;
-    
-  }
-
-  .btnSuivantChoixSerie:before{
-    content: "";
-    position: absolute;
-    right: 50%;
-    transform: translateY(-50%) scaleX(0.4) scaleY(8);
-    top: 100%;
-    width: 140%;
-    height: 180%;
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 50%;
-    display: block;
-    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
-    z-index: -1;
-  }
-
-  .btnSuivantChoixSerie:after{
-    content: "";
-    position: absolute;
-    right: 55%;
-    transform: translateY(-50%) scaleX(0.5) scaleY(10);
-    top: 180%;
-    width: 160%;
-    height: 190%;
-    background-color: #FFC53D;
-    border-radius: 50%;
-    display: block;
-    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
-    z-index: -1;
-  }
-
-  .btnSuivantChoixSerie:hover{
-    color: black;
-    border: 1px solid #FFC53D;
-    font-weight: 700;
-    border: 1px solid black;
-  }
-
-  .btnSuivantChoixSerie:hover:before{
-    top: -35%;
-    background-color: #FFC53D;
-    transform: translateX(50%) scaleY(1.3) scaleX(1);
-  }
-
-  .btnSuivantChoixSerie:hover:after{
-    top: -45%;
-    background-color: #FFC53D;
-    transform: translateX(50%) scaleY(1.3) scaleX(1);
-  }
-
-  /* ----------- Bouton Retour -------------- */
-  .btnRetourChoixSerie{
-    display: inline-block;
-    padding: 10px 22px;
-    border: 1px solid #4f4f4f;
-    border-radius: 4px;
-    transition: all 0.2s ease-in;
-    position: relative;
-    overflow: hidden;
-    font-size: 14px;
-    cursor: pointer;
-    z-index: 1;
-    margin: 1%;
-    width: 40%;
-    margin-top: 5%;
-  }
-
-  .btnRetourChoixSerie:before{
-    content: "";
-    position: absolute;
-    left: 50%;
-    transform: translateY(-50%) scaleX(0.4) scaleY(8);
-    top: 100%;
-    width: 140%;
-    height: 180%;
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 50%;
-    display: block;
-    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
-    z-index: -1;
-  }
-
-  .btnRetourChoixSerie:after{
-    content: "";
-    position: absolute;
-    left: 55%;
-    transform: translateY(-50%) scaleX(0.5) scaleY(10);
-    top: 180%;
-    width: 160%;
-    height: 190%;
-    background-color: #FFC53D;
-    border-radius: 50%;
-    display: block;
-    transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
-    z-index: -1;
-  }
-
-  .btnRetourChoixSerie:hover{
-    color: black;
-    border: 1px solid #FFC53D;
-    font-weight: 700;
-    border: 1px solid black;
-  }
-
-  .btnRetourChoixSerie:hover:before{
-    top: -35%;
-    background-color: #FFC53D;
-    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
-  }
-
-  .btnRetourChoixSerie:hover:after{
-    top: -45%;
-    background-color: #FFC53D;
-    transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
-  }
-
-/* --------- Styles pour le bouton désactivé ---------- */
-.btnSuivantChoixSerie:disabled {
-  cursor: not-allowed;
-  opacity: 0.6; 
+.btnChoix {
+  display: flex;
+  padding: 10px 18px;
+  border: 1px solid #4f4f4f;
+  border-radius: 4px;
+  transition: all 0.2s ease-in;
+  position: relative;
+  overflow: hidden;
+  font-size: 12px;
+  width: 80%;
+  margin-top: 1%;
+  cursor: pointer;
+  z-index: 1;
+  align-items: center;
+  justify-content: center;
 }
 
-.btnSuivantChoixSerie:disabled:hover,
-.btnSuivantChoixSerie:disabled:before,
-.btnSuivantChoixSerie:disabled:after {
+.btnChoix:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) scaleY(1) scaleX(1.25);
+  top: 100%;
+  width: 140%;
+  height: 180%;
+  background-color: var(--btn-bg);
+  color: black;
+  border-radius: 50%;
+  display: block;
+  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+  z-index: -1;
+}
+
+.btnChoix:after {
+  content: "";
+  position: absolute;
+  left: 55%;
+  transform: translateX(-50%) scaleY(1) scaleX(1.45);
+  top: 180%;
+  width: 160%;
+  height: 190%;
+  background-color: var(--btn-bg);
+  color: black;
+  border-radius: 50%;
+  display: block;
+  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+  z-index: -1;
+}
+
+.btnChoix:hover {
+  color: #ffffff;
+  border: 1px solid var(--btn-bg);
+}
+
+.btnChoix:hover:before {
+  top: -35%;
+  background-color: var(--bg-grad1);
+  transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+}
+
+.btnChoix:hover:after {
+  top: -45%;
+  background-color: var(--bg-grad1);
+  transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+}
+
+
+
+/* -------------------- Bouton Suivant -------------------------- */
+/* Bouton principal - fixé à un emplacement */
+.btnSuivantChoix {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 22px;
+  border: 1px solid #4f4f4f;
+  border-radius: 4px;
+  transition: all 0.2s ease-in;
+  position: fixed;
+  bottom: 40px;
+  right: 20px;
+  z-index: 1000;
+  height: 5%;
+  overflow: hidden;
+  font-size: 14px;
+  cursor: pointer;
+  width: auto;
+}
+
+/* Effet de fond avant le survol */
+.btnSuivantChoix:before {
+  content: "";
+  position: absolute;
+  right: 50%;
+  transform: translateY(-50%) scaleX(0.4) scaleY(8);
+  top: 100%;
+  width: 140%;
+  height: 180%;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  display: block;
+  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+  z-index: -1;
+}
+
+/* Effet de fond après survol */
+.btnSuivantChoix:after {
+  content: "";
+  position: absolute;
+  right: 55%;
+  transform: translateY(-50%) scaleX(0.5) scaleY(10);
+  top: 180%;
+  width: 160%;
+  height: 190%;
+  background-color: var(--btn-bg);
+  border-radius: 50%;
+  display: block;
+  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+  z-index: -1;
+}
+
+/* Effet au survol */
+.btnSuivantChoix:hover {
+  color: var(--font-color);
+  border: 1px solid var(--btn-bg);
+  font-weight: 700;
+  opacity: 1;
+}
+
+/* Animation du fond au survol */
+.btnSuivantChoix:hover:before {
+  top: -35%;
+  background-color: var(--btn-bg);
+  transform: translateX(50%) scaleY(1.3) scaleX(1);
+}
+
+.btnSuivantChoix:hover:after {
+  top: -45%;
+  background-color: var(--btn-bg);
+  transform: translateX(50%) scaleY(1.3) scaleX(1);
+}
+
+/* ----------- Bouton Retour -------------- */
+.btnRetourChoix {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 22px;
+  border: 1px solid #4f4f4f;
+  border-radius: 4px;
+  transition: all 0.2s ease-in;
+  position: fixed;
+  bottom: 40px;
+  left: 20px;
+  height: 5%;
+  z-index: 1000;
+  overflow: hidden;
+  font-size: 14px;
+  cursor: pointer;
+  width: auto;
+  opacity: 0.6;
+}
+
+
+.btnRetourChoix:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateY(-50%) scaleX(0.4) scaleY(8);
+  top: 100%;
+  width: 140%;
+  height: 180%;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  display: block;
+  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+  z-index: -1;
+}
+
+.btnRetourChoix:after {
+  content: "";
+  position: absolute;
+  left: 55%;
+  transform: translateY(-50%) scaleX(0.5) scaleY(10);
+  top: 180%;
+  width: 160%;
+  height: 190%;
+  background-color: var(--btn-bg);
+  border-radius: 50%;
+  display: block;
+  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+  z-index: -1;
+}
+
+.btnRetourChoix:hover {
+  color: var(--font-color);
+  border: 1px solid var(--btn-bg);
+  font-weight: 700;
+  border: 1px solid black;
+  opacity: 1;
+}
+
+.btnRetourChoix:hover:before {
+  top: -35%;
+  background-color: var(--btn-bg);
+  transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+}
+
+.btnRetourChoix:hover:after {
+  top: -45%;
+  background-color: var(--btn-bg);
+  transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+}
+
+/* --------- Styles pour le bouton désactivé ---------- */
+.btnSuivantChoix:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btnSuivantChoix:disabled:hover,
+.btnSuivantChoix:disabled:before,
+.btnSuivantChoix:disabled:after {
   border: 1px solid #4f4f4f;
   color: inherit;
   top: 100%;
@@ -221,41 +340,299 @@
 }
 
 /* ------------------ Card Prez ------------------------ */
-.cardPrezSerie {
+.containerSeriePropose {
+  background: linear-gradient(rgba(30, 27, 38, 0.95), rgba(30, 27, 38, 0.95));
+  background-image: var(--bg-image);
+  height: 90vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: repeat;
   position: relative;
-  width: 30%;
-  height: 70vh;
-  overflow: hidden;
-  margin-left: 35%;
+  border-radius: 3%;
 }
 
-.cardPrezSerie::before {
-  content: '';
+.containerSeriePropose:after {
+  content: "";
   position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.523) 0%, rgba(0, 0, 0, 0.307) 50%, rgba(102, 102, 102, 1) 100%);
+  mix-blend-mode: multiply;
+  filter: blur(5px);
+  z-index: 1;
+  border-radius: 3%;
+}
+
+/* Pour que le contenu à l'intérieur de .containerSeriePropose soit au-dessus du filtre */
+
+.containerSeriePropose>* {
+  position: relative;
+  z-index: 2;
+}
+
+.movieMenu button {
+  position: absolute;
+  right: 15px;
+  top: 20px;
+  z-index: 999;
+  font-size: 15px;
+  color: var(--hover-btn);
+  border-radius: 10px;
+  border: none;
+  padding: 1%;
+  background-color: var(--bg-grad1);
+  filter: drop-shadow(4px 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+.movieMenu button:hover {
+  border: 1px solid var(--hover-btn);
+}
+
+.containerCardInfos {
+  width: 100%;
+  height: 100%;
+  padding-top: 1%;
+}
+
+.telephoneContainer {
+  width: 40%;
+  height: 98%;
+  background-color: #000000;
+  margin-left: 30%;
+  margin-bottom: 10%;
+}
+
+.movieImg {
+  width: 100%;
+  height: 50%;
+  background-image: var(--bg-image-movie);
+  z-index: 111;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  /* Propriété pour appliquer le masque */
+  mask-image: linear-gradient(to bottom,
+          rgba(0, 0, 0, 1) 0%,
+          rgba(0, 0, 0, 1) 35%,
+          rgba(0, 0, 0, 1) 50%,
+          rgba(0, 0, 0, 1) 65%,
+          rgba(0, 0, 0, 0.6) 85%,
+          rgba(0, 0, 0, 0) 100%);
+  background-size: cover;
+  position: relative;
+}
+
+.movie {
+  background-size: contain;
+  background-size: cover;
+  z-index: 1 !important;
+  width: 100%;
+  height: 97vh;
+  display: block;
+  border-radius: 4px;
+}
+
+.cardInfoText {
+  padding: 0px 2%;
+  text-align: justify;
+  color: rgb(255, 255, 255);
+}
+
+.cardInfoText h1 {
+  font-size: 30px;
+  text-transform: uppercase;
+  padding-top: 2%;
+  text-align: center;
+  color: var(--hover-btn);
+  font-weight: 700;
+  z-index: 9999 !important;
+  font-family: var(--font-family);
+  letter-spacing: 2px;
+}
+
+.cardInfoText ul {
+  list-style: none;
+  display: flex;
+}
+
+.genreDuree {
+  display: flex;
+  justify-content: space-between;
+  color: rgb(176, 176, 176);
+  font-size: 13px;
+}
+
+.SerieCardGenre {
+  margin-left: 2%;
+}
+
+.descriptionRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 2%;
+}
+
+.dureeCardSerie {
+  margin-right: 2%;
+}
+
+.noteSerieCard span {
+  color: #FFC53D;
+}
+
+.noteSerieCard {
+  margin-left: 2%;
+}
+
+.dateSortieCard {
+  display: flex;
+  color: rgb(176, 176, 176);
+  margin-bottom: 2%;
+  justify-content: flex-end;
+  margin-right: 2%;
+  margin-left: 2%;
+}
+
+.SerieCardDesc {
+  font-size: 14px;
+  width: 98%;
+  margin-left: 1%;
+}
+
+.actionRow {
+  margin-top: 24px;
+}
+
+/* Style Popup */
+
+.modalDescSerie {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: var(--bg-image);
-  background-size: cover;
-  background-position: center;
-  filter: blur(); 
-  z-index: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
-.titreSerie {
+.modalContentDescSerie {
+  background-color: white;
+  color: black;
+  padding: 20px;
+  border-radius: 4px;
+  max-width: 500px;
+  width: 80%;
   position: relative;
-  z-index: 1; 
-  padding: 20px; 
+}
+
+.closeBtnDescSerie {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.voirPlusBtnDescSerie {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 5px;
+}
+
+/* ------------ Popup watchlist ------------------ */
+
+.popupWatchlist {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
+  color: var(--font-color);
+  font-size: 13px;
+  background-color: var(--bg-grad2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1% 1% 0 1%;
+  z-index: 1111;
 }
 
-.realSerie{
-  position: relative;
-  z-index: 1;
-}
+@media only screen and (max-width : 768px) {
 
-.acteursSerie{
-  position: relative;
-  z-index: 1;
+  .btnChoix {
+      width: 40%;
+      height: 50px;
+      padding: 5px 11px;
+      font-size: 12px;
+      display: inline-block;
+  }
+
+  .mobileChoixFiltres {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+  }
+
+  #divChoixGenreSerieMobile {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      text-align: center;
+  }
+
+  #divChoixDureeSerieMobile,
+  #divChoixScoreSerieMobile,
+  #divChoixDateSerieMobile {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 50vh;
+      width: 100%;
+  }
+
+  #divChoixDureeSerieMobile .btnChoix,
+  #divChoixScoreSerieMobile .btnChoix,
+  #divChoixDateSerieMobile .btnChoix {
+      width: 100%;
+      margin-bottom: 5%;
+  }
+
+  .containerSeriePropose {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .containerSeriePropose {
+      background: none;
+      background-image: none;
+      height: 100vh;
+  }
+
+
+  .movieMenu button:hover {
+      border: 1px solid var(--hover-btn);
+  }
+
+  .containerCardInfos {
+      width: 100%;
+      height: 100%;
+      padding-top: 1%;
+  }
+
+  .telephoneContainer {
+      width: 100%;
+      margin-left: 0;
+  }
+
+  .btnSuivantChoix {
+      font-size: 10px;
+  }
 }

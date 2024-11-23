@@ -1,155 +1,120 @@
 import React, { useEffect, useState } from 'react'
-import jsonData from '../asset/data/allocine_top_series.json'
-import axios from 'axios'
+import jsonData from '../asset/data/list_series_backup.json'
 import './style.css'
-import { BsChevronDoubleLeft, BsChevronDoubleRight } from "react-icons/bs";
-import { FaRandom } from "react-icons/fa";
-import { RiStarFill } from "react-icons/ri";
+import { useAppStore } from '../store'
+import { useIsMobile } from '../hook/useIsMobile'
+import { BsChevronDoubleLeft, BsChevronDoubleRight } from 'react-icons/bs'
+import { RiStarFill } from 'react-icons/ri'
+import { SerieDescription } from './popups'
+import { FaRandom } from 'react-icons/fa'
+import PopUpWatchlist from './popUpWatchlist'
+
 
 
 export default function TrouverSerie() {
   const [series, setSeries] = useState([])
-  const [watchlist, setWatchlist] = useState([])
+  const watchlist = useAppStore((state) => state.watchlist)
+  const getWatchlist = useAppStore((state) => state.getWatchlist)
+  const getUserData = useAppStore((state) => state.getUserData)
+
+  const token = localStorage.getItem("token")
+
   const [historique, setHistorique] = useState([])
 
   const [choixGenre, setChoixGenre] = useState([])
-  const [choixDateSortie, setDateSortie] = useState([])
-  const [choixScore, setChoixScore] = useState([])
-  const [choixDureeEp, setChoixDureeEp] = useState([])
+  const [choixDateSortie, setChoixDateSortie] = useState([])
+  const [choixNote, setChoixNote] = useState([])
 
-  const [genresUnique, setGenreUnique] = useState([])
+  const [genresUnique, setGenresUnique] = useState([])
+  const [noteUnique, setNoteUnique] = useState([])
   const [seriesFiltrees, setSeriesFiltrees] = useState([])
 
-  const [divVisible, setDivVisible] = useState("divChoixGenreSerie")
+  const [divVisible, setDivVisible] = useState("divChoixFiltres")
+  const [divVisibleMobile, setDivVisibleMobile] = useState("divChoixGenreserieMobile")
   const [selectedRandomSerie, setSelectedRandomSerie] = useState(null)
+
+  const isMobile = useIsMobile()
 
   const [filtres, setFiltres] = useState({
     genre: [],
     dateSortie: [],
-    pressScore: [],
-    dureeEp: []
+    note: [],
   })
 
   useEffect(() => {
-    setSeries(jsonData);
-  }, [])
-
-
+    if (token) {
+      getWatchlist(token) // Récup de la watchlist
+      getUserData(token) // Récup de l'user connecté
+    }
+  }, [token, getWatchlist, getUserData])
 
   useEffect(() => {
+    console.log("Filtres :", filtres)
+
+    // ------------------------- Récupération des données -----------------
+    setSeries(jsonData)
+  }, [filtres])
+
+  useEffect(() => {
+    // ---------------- Extraction des genres uniques -------------
     const extraireGenreUnique = () => {
-      const uniqueGenres = [];
+      const uniqueGenres = []
       for (let serie of series) {
         if (serie.genres && Array.isArray(serie.genres)) {
           for (let genre of serie.genres) {
             if (!uniqueGenres.includes(genre)) {
-              uniqueGenres.push(genre);
+              uniqueGenres.push(genre)
             }
           }
         }
       }
-      setGenreUnique(uniqueGenres);
+      setGenresUnique(uniqueGenres)
     }
     if (series.length > 0) {
-      extraireGenreUnique();
+      extraireGenreUnique()
+    }
+
+    // ------------------------- Extraction notes unique --------------------
+    const extraireNoteUnique = () => {
+      const uniqueNote = []
+      for (let serie of series) {
+        if (serie.note_user) {
+          if (!uniqueNote.includes(serie.note_user)) {
+            uniqueNote.push(serie.note_user)
+          }
+        }
+      }
+      setNoteUnique(uniqueNote)
+    }
+
+    if (series.length > 0) {
+      extraireNoteUnique()
     }
   }, [series])
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      axios.get("https://cska777.pythonanywhere.com/watchlist/", {
-        headers: {
-          Authorization: `Token ${token}`
-        }
-      }).then(response => {
-        setWatchlist(response.data);
-        console.log(response.data);
-      }).catch(() => {
-        console.log("Erreur lors de la récupération de la watchlist");
-      })
-    }
-  }, [])
-  // ---------- Choix genre -------------
+  // --------------------- Choix genre ------------------------
   const choisirGenre = (genreSelectionne) => {
-    const index = choixGenre.indexOf(genreSelectionne);
-    if (index > -1) {
-      const newChoixGenre = [...choixGenre];
-      newChoixGenre.splice(index, 1);
-
-      const newFiltres = { ...filtres };
-      newFiltres.genre = [...filtres.genre];
-      newFiltres.genre.splice(index, 1);
-
-      setChoixGenre(newChoixGenre);
-      setFiltres(newFiltres);
-    } else {
-      const newChoixGenre = [...choixGenre, genreSelectionne];
-      const newFiltres = { ...filtres, genre: [...filtres.genre, genreSelectionne] };
-
-      setChoixGenre(newChoixGenre);
-      setFiltres(newFiltres);
-    }
-  }
-
-  // ---------- Choix durée --------------------
-  const choisirTrancheDuree = (trancheDureeSelectionnee) => {
-    const index = trancheDureeIndex(trancheDureeSelectionnee);
-
-    if (index > -1) {
-      const newChoixDureeEp = [...choixDureeEp];
-      newChoixDureeEp.splice(index, 1);
-      setChoixDureeEp(newChoixDureeEp);
-
-      const newFiltres = { ...filtres };
-      newFiltres.dureeEp.splice(index, 1);
-      setFiltres(newFiltres);
-    } else {
-      const newChoixDureeEp = [...choixDureeEp, trancheDureeSelectionnee];
-      const newFiltres = { ...filtres, dureeEp: [...filtres.dureeEp, trancheDureeSelectionnee] };
-
-      setChoixDureeEp(newChoixDureeEp);
-      setFiltres(newFiltres);
-    }
-  }
-
-  const trancheDureeIndex = (trancheDureeSelectionnee) => {
-    for (let i = 0; i < choixDureeEp.length; i++) {
-      if (tranchesEgalesDuree(choixDureeEp[i], trancheDureeSelectionnee)) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  const tranchesEgalesDuree = (tranche1, tranche2) => {
-    return tranche1.debut === tranche2.debut && tranche1.fin === tranche2.fin;
-  };
-
-  const isTrancheDureeSelected = (tranche) => {
-    return choixDureeEp.some((t) => t.debut === tranche.debut && t.fin === tranche.fin);
-  }
-
-  // ------------------- Choix Date -------------
-  const choisirTrancheDate = (trancheDateSelectionnee) => {
-    const index = trancheDateIndex(trancheDateSelectionnee)
-
-    if (index > -1) {
-      const newChoixDateSortie = [...choixDateSortie]
-      newChoixDateSortie.splice(index, 1)
-      setDateSortie(newChoixDateSortie)
+    const index = choixGenre.indexOf(genreSelectionne)
+    if (index > - 1) {
+      const newChoixGenre = [...choixGenre]
+      newChoixGenre.splice(index, 1)
 
       const newFiltres = { ...filtres }
-      newFiltres.dateSortie.splice(index, 1)
+      newFiltres.genre = [...filtres.genre]
+      newFiltres.genre.splice(index, 1)
+
+      setChoixGenre(newChoixGenre)
       setFiltres(newFiltres)
     } else {
-      const newChoixDateSortie = [...choixDateSortie, trancheDateSelectionnee]
-      const newFiltres = { ...filtres, dateSortie: [...filtres.dateSortie, trancheDateSelectionnee] }
+      const newChoixGenre = [...choixGenre, genreSelectionne]
+      const newFiltres = { ...filtres, genre: [...filtres.genre, genreSelectionne] }
 
-      setDateSortie(newChoixDateSortie)
+      setChoixGenre(newChoixGenre)
       setFiltres(newFiltres)
     }
-  };
+  }
+
+  // ------------------------- Choix date ------------------------
 
   const trancheDateIndex = (trancheDateSelectionnee) => {
     for (let i = 0; i < choixDateSortie.length; i++) {
@@ -168,41 +133,46 @@ export default function TrouverSerie() {
     return choixDateSortie.some(t => t.debut === tranche.debut && t.fin === tranche.fin)
   };
 
-  // ------------------- Choix Score ----------------
-  const choisirTrancheScore = (trancheScoreSelectionnee) => {
-    const index = trancheScoreIndex(trancheScoreSelectionnee)
+  const choisirTrancheDate = (trancheDateSelectionnee) => {
+    const index = trancheDateIndex(trancheDateSelectionnee)
+
     if (index > -1) {
-      const newChoixScore = [...choixScore]
-      newChoixScore.splice(index, 1)
-      setChoixScore(newChoixScore)
+      const newChoixDateSortie = [...choixDateSortie]
+      newChoixDateSortie.splice(index, 1)
+      setChoixDateSortie(newChoixDateSortie)
 
       const newFiltres = { ...filtres }
-      newFiltres.pressScore.splice(index, 1)
+      newFiltres.dateSortie.splice(index, 1)
       setFiltres(newFiltres)
     } else {
-      const newChoixScore = [...choixScore, trancheScoreSelectionnee]
-      const newFiltres = { ...filtres, pressScore: [...filtres.pressScore, trancheScoreSelectionnee] }
+      const newChoixDateSortie = [...choixDateSortie, trancheDateSelectionnee]
+      const newFiltres = { ...filtres, dateSortie: [...filtres.dateSortie, trancheDateSelectionnee] }
 
-      setChoixScore(newChoixScore)
+      setChoixDateSortie(newChoixDateSortie)
       setFiltres(newFiltres)
     }
   }
 
-  const trancheScoreIndex = (trancheScoreSelectionnee) => {
-    for (let i = 0; i < choixScore.length; i++) {
-      if (tranchesEgalesScore(choixScore[i], trancheScoreSelectionnee)) {
-        return i
-      }
+  // --------------------------- Choix Note ----------------------------
+  const choisirNote = (noteSelectionnee) => {
+    const index = choixNote.indexOf(noteSelectionnee)
+
+    if (index > -1) {
+      const newChoixNote = [...choixNote]
+      newChoixNote.splice(index, 1)
+      setChoixNote(newChoixNote)
+
+      const newFiltres = { ...filtres }
+      newFiltres.note.splice(index, 1)
+      setFiltres(newFiltres)
+    } else {
+      const newChoixNote = [...choixNote, noteSelectionnee]
+      setChoixNote(newChoixNote)
+
+      const newFiltres = { ...filtres, note: [...filtres.note, noteSelectionnee] }
+      setFiltres(newFiltres)
+
     }
-    return -1
-  }
-
-  const tranchesEgalesScore = (tranche1, tranche2) => {
-    return tranche1.debut === tranche2.debut && tranche1.fin === tranche2.fin
-  }
-
-  const isTrancheScoreSelected = (tranche) => {
-    return choixScore.some((t) => t.debut === tranche.debut && t.fin === tranche.fin)
   }
 
   // ------------------------- Watchlist -----------------------
@@ -215,38 +185,36 @@ export default function TrouverSerie() {
     return historique.some((entry) => entry.titre === serie.titre)
   };
 
-  // ------------- Filtre Série ----------------
+  // ----------------------- Filtrage ilm ------------------------
   useEffect(() => {
     const filteredSeries = series.filter((serie) => {
       return (
         (filtres.genre.length === 0 || filtres.genre.some((genre) => serie.genres.includes(genre))) &&
 
-        (filtres.dateSortie.length === 0 || filtres.dateSortie.some((tranche) => serie.date_de_sortie >= tranche.debut && serie.date_de_sortie <= tranche.fin)) &&
+        (filtres.dateSortie.length === 0 || filtres.dateSortie.some((tranche) => serie.date_sortie >= tranche.debut && serie.date_sortie <= tranche.fin)) &&
 
-        (filtres.pressScore.length === 0 || filtres.pressScore.some((tranche) => serie.press_score >= tranche.debut && serie.press_score < tranche.fin)) &&
+        (filtres.note.length === 0 || filtres.note.includes(serie.note_user)) &&
 
-        (filtres.dureeEp.length === 0 || filtres.dureeEp.some((tranche) => serie.duree_moyenne_episode >= tranche.debut && serie.duree_moyenne_episode <= tranche.fin)) &&
 
         !isSerieWatchlist(serie) && !isSerieHistorique(serie)
       )
     })
+    setSeriesFiltrees(filteredSeries)
 
-    console.log("Filtered Series: ", filteredSeries);  
-    setSeriesFiltrees(filteredSeries);
 
-    // Sélectionner une série aléatoire parmi les séries filtrées
+    // Sélection du serie aléatoire parmi les series filtrés
     if (filteredSeries.length > 0) {
-      const randomIndex = Math.floor(Math.random() * filteredSeries.length);
-      setSelectedRandomSerie(filteredSeries[randomIndex]);
+      const randomIndex = Math.floor(Math.random() * filteredSeries.length)
+      setSelectedRandomSerie(filteredSeries[randomIndex])
     } else {
-      setSelectedRandomSerie(null);
+      setSelectedRandomSerie(null)
     }
   }, [filtres, series, watchlist, historique])
 
-  //------------- Selection série aléatoire ------------------
+
+  // ------------ Fonction de sélection aléatoire -----------------
   const selectRandomSerie = () => {
     if (seriesFiltrees.length === 0) {
-      console.log("Aucune série trouvée")
       return null
     }
 
@@ -254,233 +222,421 @@ export default function TrouverSerie() {
     const selectedRandomSerie = seriesFiltrees[randomIndex]
 
     setHistorique([...historique, selectedRandomSerie])
-    setSelectedRandomSerie(selectedRandomSerie);
+    setSelectedRandomSerie(selectedRandomSerie)
 
-    console.log("Série sélectionnée : ",selectedRandomSerie)
     return selectedRandomSerie
-
-  };
-
+  }
 
   //---------------------- Navigation choix ----------------------------
   const suivant = () => {
-    if (divVisible === "divChoixGenreSerie") {
-      setDivVisible("divChoixDureeEp")
-    } else if (divVisible === "divChoixDureeEp") {
-      setDivVisible("divChoixDateSerie")
-    } else if (divVisible === "divChoixDateSerie") {
-      setDivVisible("divChoixScoreSerie")
-    } else if (divVisible === "divChoixScoreSerie") {
-      setDivVisible("divSerieProposee")
+    if (divVisible === "divChoixFiltres") {
+      setDivVisible("divSeriePropose")
       selectRandomSerie()
     }
   }
 
   const retour = () => {
-    if (divVisible === "divChoixDureeEp") {
-      setDivVisible("divChoixGenreSerie")
-    } else if (divVisible === "divChoixDateSerie") {
-      setDivVisible("divChoixDureeEp")
-    } else if (divVisible === "divChoixScoreSerie") {
-      setDivVisible("divChoixDateSerie")
-    } else if (divVisible === "divSerieProposee") {
-      setDivVisible("divChoixScoreSerie")
+    if (divVisible === "divSeriePropose") {
+      setDivVisible("divChoixFiltres")
+      setHistorique([])
+    }
+
+  }
+
+  // ------------------------- Navigation choix mobile --------------------
+  const suivantMobile = () => {
+    if (divVisibleMobile === "divChoixGenreSerieMobile") {
+      setDivVisibleMobile("divChoixDateSerieMobile")
+    } else if (divVisibleMobile === "divChoixDateSerieMobile") {
+      setDivVisibleMobile("divChoixScoreSerieMobile")
+    } else if (divVisibleMobile === "divChoixScoreSerieMobile") {
+      setDivVisibleMobile("divSerieProposeMobile")
+      selectRandomSerie()
+    }
+  }
+
+  const retourMobile = () => {
+    if (divVisibleMobile === "divChoixDateSerieMobile") {
+      setDivVisibleMobile("divChoixSerieMobile")
+    } else if (divVisibleMobile === "divChoixScoreSerieMobile") {
+      setDivVisibleMobile("divChoixDateSerieMobile")
+    } else if (divVisibleMobile === "divSerieProposeMobile") {
+      setDivVisibleMobile("divChoixScoreSerieMobile")
     }
   }
 
   return (
     <div className='containerFindSerie'>
-      {divVisible === "divChoixGenreSerie" && (
-        <div id='divChoixGenreSerie'>
-          {genresUnique.map((genre, index) => {
-            return <button
-              key={index}
-              onClick={() => choisirGenre(genre)}
-              className={`btnChoixSerie ${choixGenre.includes(genre) ? 'selected' : 'unselected'} `}
-            >{genre}
-            </button>;
-          })}
-          <br></br>
-          <div className='d-flex justify-content-center'>
-            <button onClick={suivant} disabled={choixGenre.length < 1} className='btnSuivantChoixSerie'> Suivant <BsChevronDoubleRight /> </button>
-          </div>
+      {isMobile ? (
+        <div className='mobileChoixFiltres'>
+          {divVisibleMobile === "divChoixGenreSerieMobile" && (
+            <div id='divChoixGenreSerieMobile'>
+              <div className='btnSelecSerieMobile'>
+                {genresUnique.map((genre, index) => {
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => choisirGenre(genre)}
+                      className={`btnChoix ${choixGenre.includes(genre) ? 'selectedSerie' : 'unselected'}`}
+                    >
+                      {genre}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className='divBtnChoixMobile'>
+                <button onClick={suivantMobile} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
+              </div>
+            </div>
+          )}
+
+
+          {divVisibleMobile === "divChoixDateSerieMobile" && (
+            <div id='divChoixDateSerieMobile'>
+              <div className='btnSelecSerieMobile'>
+                {[{ debut: 0, fin: 1979 }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDate(tranche)}
+                    className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedSerie' : 'unselected'}`}
+                  >
+                    Sortie avant 1980
+                  </button>
+                ))}
+                {[{ debut: 1980, fin: 1999 }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDate(tranche)}
+                    className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedSerie' : 'unselected'}`}
+                  >
+                    Sortie : 1980 - 1999
+                  </button>
+                ))}
+                {[{ debut: 2000, fin: 2009 }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDate(tranche)}
+                    className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedSerie' : 'unselected'}`}
+                  >
+                    Sortie : 2000 - 2009
+                  </button>
+                ))}
+                {[{ debut: 2010, fin: 2019 }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDate(tranche)}
+                    className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedSerie' : 'unselected'}`}
+                  >
+                    Sortie : 2010 - 2019
+                  </button>
+                ))}
+                {[{ debut: 2020, fin: Infinity }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDate(tranche)}
+                    className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedSerie' : 'unselected'}`}
+                  >
+                    Sortie après 2019
+                  </button>
+                ))}
+              </div>
+              <div className='divBtnChoixMobile'>
+                <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
+                <button onClick={suivantMobile} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
+              </div>
+            </div>
+          )}
+
+          {divVisibleMobile === "divChoixScoreSerieMobile" && (
+            <div id='divChoixScoreSerieMobile'>
+              <div className='btnSelecSerieMobile'>
+                {noteUnique.map((note, index) => {
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => choisirNote(note)}
+                      className={`btnChoix ${choixNote.includes(note) ? 'selectedSerie' : 'unselected'}`}
+                    >
+                      {note} <RiStarFill />
+                    </button>
+                  );
+                })}
+              </div>
+              <div className='divBtnChoixMobile'>
+                <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
+                <button onClick={suivantMobile} className='btnSuivantChoix'> Propose moi une série <BsChevronDoubleRight /> </button>
+              </div>
+            </div>
+          )}
+
+          {divVisibleMobile === "divSerieProposeMobile" && (
+            <div id='divSerieProposeMobile'>
+              {selectedRandomSerie ? (
+                <div className='containerSeriePropose' style={{ "--bg-image": `url(${selectedRandomSerie.poster_url})` }}>
+                  <div className='containerCardInfos'>
+                    <div className='telephoneContainer'>
+                      <div className='movie'>
+                        <div className='movieMenu'>
+                          <PopUpWatchlist selectedSerie={selectedRandomSerie} />
+                        </div>
+                        <div className='movieImg' style={{ "--bg-image-movie": `url(${selectedRandomSerie.poster_url})` }}></div>
+                        <div className='cardInfoText'>
+                          <div className='mr-grid'>
+                            <h1>{selectedRandomSerie.titre}</h1>
+                            <div className='col1 genreDuree'>
+                              <p className='serieCardGenre'>
+                                {selectedRandomSerie.genres.join(", ")}
+                              </p>
+                              {selectedRandomSerie.duree_minutes === null ? (
+                                <p className='dureeCardSerie'>Durée non renseignée</p>
+                              ) : (
+                                <p className='dureeCardSerie'>
+                                 
+                                </p>
+                              )}
+                              <p className='noteSerieCard'>
+                                {selectedRandomSerie.note_user} <span><RiStarFill /></span>
+                              </p>
+                            </div>
+                            <div className='mr-grid'>
+                              <div className='col1'>
+                                <div className='SerieCardDesc'>
+                                  <SerieDescription
+                                    synopsis={selectedRandomSerie.synopsis}
+                                    acteurs={selectedRandomSerie.acteurs}
+                                    realisateur={selectedRandomSerie.realisateur}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            <div className='d-flex'>
+                              <div>
+                                <i></i>
+                              </div>
+                              <div className='dateSortieCard'>
+                                Date de sortie : {selectedRandomSerie.date_sortie}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className='noSerieDiv'>Aucune série trouvée avec les filtres sélectionnés.</div>
+              )}
+              <div className='divBtnChoix d-flex justify-content-around'>
+                <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
+                <button onClick={selectRandomSerie} disabled={seriesFiltrees.length <= 1} className='btnSuivantChoix'> Propose moi une autre série <FaRandom /></button>
+              </div>
+            </div>
+          )}
         </div>
+      ) : (
+        <>
+          {divVisible === "divChoixFiltres" && (
+
+            <div className='divChoixFiltres'>
+
+              <div id='divChoixGenre' className='divSelecSerie'>
+                <div className='divH2FF'>
+                  <h2>Genres : </h2>
+                  {filtres.genre.length > 0 ? (
+                    <ul>
+                      {filtres.genre.map((genre, index) => {
+                        return <li key={index} >{genre}</li>
+                      })}
+                    </ul>
+                  ) : (
+                    <p>Selectionnez un ou plusieurs filtres </p>
+                  )}
+                </div>
+                <div className='divBtnSelecSerie'>
+                  {genresUnique.map((genre, index) => {
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => choisirGenre(genre)}
+                        className={`btnChoix ${choixGenre.includes(genre) ? 'selectedSerie' : 'unselected'}`}
+                      >
+                        {genre}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div id='divChoixDate' className='divSelecSerie'>
+                <div className='divH2FF'>
+                  <h2>Date de sortie : </h2>
+                  {filtres.dateSortie.length > 0 ? (
+                    <ul>
+                      {filtres.dateSortie.map((dateSortie, index) => {
+                        return (
+                          <li key={index}>
+                            {
+                              dateSortie.debut === 0 ? "Sortie avant 1980" :
+                                dateSortie.debut === 1980 ? "Date de sortie entre 1980 et 1999" :
+                                  dateSortie.debut === 2000 ? "Date de sortie entre 2000 et 2009" :
+                                    dateSortie.debut === 2010 ? "Date de sortie entre 2010 et 2019" :
+                                      dateSortie.debut === 2020 ? "Sortie après 2019" :
+                                        ""
+                            }
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  ) : (
+                    <p>Selectionnez un ou plusieurs filtres</p>
+                  )}
+                </div>
+                <div className='divBtnSelecSerie'>
+                  {[{ debut: 0, fin: 1979 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedSerie' : 'unselected'}`}
+                    >
+                      Sortie avant 1980
+                    </button>
+                  ))}
+                  {[{ debut: 1980, fin: 1999 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedSerie' : 'unselected'}`}
+                    >
+                      Sortie : 1980 - 1999
+                    </button>
+                  ))}
+                  {[{ debut: 2000, fin: 2009 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedSerie' : 'unselected'}`}
+                    >
+                      Sortie : 2000 - 2009
+                    </button>
+                  ))}
+                  {[{ debut: 2010, fin: 2019 }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedSerie' : 'unselected'}`}
+                    >
+                      Sortie : 2010 - 2019
+                    </button>
+                  ))}
+                  {[{ debut: 2020, fin: Infinity }].map((tranche, index) => (
+                    <button
+                      key={index}
+                      onClick={() => choisirTrancheDate(tranche)}
+                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedSerie' : 'unselected'}`}
+                    >
+                      Sortie après 2019
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div id='divChoixScore' className='divSelecSerie'>
+                <div className='divH2FF'>
+                  <h2>Note : </h2>
+                  {filtres.note.length > 0 ? (
+                    <ul>
+                      {filtres.note.map((note, index) => {
+                        return <li key={index}> {note} <RiStarFill /> </li>
+                      })}
+                    </ul>
+                  ) : (
+                    <p>Selectionnez un ou plusieurs filtres</p>
+                  )}
+                </div>
+                <div className='divBtnSelecSerie'>
+                  {noteUnique.map((note, index) => {
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => choisirNote(note)}
+                        className={`btnChoix ${choixNote.includes(note) ? 'selectedSerie' : 'unselected'}`}
+                      >
+                        {note} <RiStarFill />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className='divBtnChoix d-flex justify-content-around'>
+                <button onClick={suivant} className='btnSuivantChoix fixedBtn'> Propose moi une série <BsChevronDoubleRight /> </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
-
-      {divVisible === "divChoixDureeEp" && (
-        <div id='divChoixDureeEp'>
-          <div className='d-flex justify-content-center'>
-            {[{ debut: 0, fin: 19 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDuree(tranche)}
-                className={`btnChoixSerie ${isTrancheDureeSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                Moins de 20 minutes
-              </button>
-            ))}
-            {[{ debut: 20, fin: 39 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDuree(tranche)}
-                className={`btnChoixSerie ${isTrancheDureeSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                20 - 39 minutes
-              </button>
-            ))}
-            {[{ debut: 40, fin: Infinity }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDuree(tranche)}
-                className={`btnChoixSerie ${isTrancheDureeSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                40 minutes et +
-              </button>
-            ))}
-          </div>
-          <div className='divBtnChoixSerie d-flex justify-content-around'>
-            <button onClick={retour} className='btnRetourChoixSerie'><BsChevronDoubleLeft /> Retour  </button>
-            <button onClick={suivant} disabled={choixDureeEp.length < 1} className='btnSuivantChoixSerie'> Suivant <BsChevronDoubleRight /> </button>
-          </div>
-        </div>
-      )}
-
-      {divVisible === "divChoixDateSerie" && (
-        <div id='divChoixDateSerie'>
-          <div className='d-flex justify-content-center'>
-            {[{ debut: 0, fin: 1979 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDate(tranche)}
-                className={`btnChoixSerie ${isTrancheDateSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                Sortie avant 1980
-              </button>
-            ))}
-            {[{ debut: 1980, fin: 1999 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDate(tranche)}
-                className={`btnChoixSerie ${isTrancheDateSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                Sortie : 1980 - 1999
-              </button>
-            ))}
-            {[{ debut: 2000, fin: 2009 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDate(tranche)}
-                className={`btnChoixSerie ${isTrancheDateSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                Sortie : 2000 - 2009
-              </button>
-            ))}
-            {[{ debut: 2010, fin: 2019 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDate(tranche)}
-                className={`btnChoixSerie ${isTrancheDateSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                Sortie : 2010 - 2019
-              </button>
-            ))}
-            {[{ debut: 2020, fin: Infinity }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheDate(tranche)}
-                className={`btnChoixSerie ${isTrancheDateSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                Sortie après 2019
-              </button>
-            ))}
-          </div>
-          <div className='divBtnChoixSerie d-flex justify-content-around'>
-            <button onClick={retour} className='btnRetourChoixSerie'><BsChevronDoubleLeft /> Retour  </button>
-            <button onClick={suivant} disabled={choixDateSortie.length < 1} className='btnSuivantChoixSerie'> Suivant <BsChevronDoubleRight /> </button>
-          </div>
-        </div>
-      )}
-
-      {divVisible === "divChoixScoreSerie" && (
-        <div id='divChoixScoreSerie'>
-          <div className='d-flex justify-content-center'>
-            {[{ debut: 1, fin: 1.9 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheScore(tranche)}
-                className={`btnChoixSerie ${isTrancheScoreSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                Note de la presse : <br></br>
-                <RiStarFill />
-              </button>
-            ))}
-            {[{ debut: 2, fin: 2.9 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheScore(tranche)}
-                className={`btnChoixSerie ${isTrancheScoreSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                Note de la presse : <br></br>
-                <RiStarFill /><RiStarFill />
-              </button>
-            ))}
-            {[{ debut: 3, fin: 3.9 }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheScore(tranche)}
-                className={`btnChoixSerie ${isTrancheScoreSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                Note de la presse : <br></br>
-                <RiStarFill /><RiStarFill /><RiStarFill />
-              </button>
-            ))}
-            {[{ debut: 4, fin: Infinity }].map((tranche, index) => (
-              <button
-                key={index}
-                onClick={() => choisirTrancheScore(tranche)}
-                className={`btnChoixSerie ${isTrancheScoreSelected(tranche) ? 'selected' : 'unselected'}`}
-              >
-                Note de la presse : <br></br>
-                <RiStarFill /><RiStarFill /><RiStarFill /><RiStarFill /> <br></br>
-                et +
-              </button>
-            ))}
-          </div>
-          <div className='divBtnChoixSerie d-flex justify-content-around'>
-            <button onClick={retour} className='btnRetourChoixSerie'><BsChevronDoubleLeft /> Retour  </button>
-            <button onClick={suivant} disabled={choixScore.length < 1} className='btnSuivantChoixSerie'> Suivant <BsChevronDoubleRight /> </button>
-          </div>
-
-        </div>
-      )}
-
-      {divVisible === "divSerieProposee" && (
-        <div id='divSerieProposee'>
+      {divVisible === "divSeriePropose" && (
+        <div id='divSeriePropose'>
           {selectedRandomSerie ? (
-            <div className='cardPrezSerie'style={{ '--bg-image': `url(${selectedRandomSerie.illustration_url})`}}> 
-              <div className='titreSerie text-danger'>
-                {selectedRandomSerie.titre}
-              </div>
-              <div className='realSerie'>
-                Réalisation : {selectedRandomSerie.createurs}
-              </div>
-              <div className='acteursSerie'>
-                Acteurs : {selectedRandomSerie.acteurs} 
+            <div className='containerSeriePropose' style={{ "--bg-image": `url(${selectedRandomSerie.poster_url})` }}>
+              <div className='containerCardInfos'>
+                <div className='telephoneContainer'>
+                  <div className='movie'>
+                    <div className='movieMenu'>
+                      <PopUpWatchlist selectedSerie={selectedRandomSerie} />
+                    </div>
+                    <div className='movieImg' style={{ "--bg-image-movie": `url(${selectedRandomSerie.poster_url})` }}></div>
+                    <div className='cardInfoText'>
+                      <div className='mr-grid'>
+                        <h1>{selectedRandomSerie.titre}</h1>
+                        <div className='col1 genreDuree'>
+                          <p className='serieCardGenre'>
+                            {selectedRandomSerie.genres.join(", ")}
+                          </p>
+                          {selectedRandomSerie.duree_minutes === null ? (
+                            <p className='dureeCardSerie'>Durée non renseignée</p>
+                          ) : (
+                            <p className='dureeCardSerie'>
+                             
+                            </p>
+                          )}
+                          <p className='noteSerieCard'>
+                            {selectedRandomSerie.note_user} <span><RiStarFill /></span>
+                          </p>
+                        </div>
+                        <div className='mr-grid'>
+                          <div className='col1'>
+                            <div className='serieCardDesc'>
+                              <SerieDescription
+                                synopsis={selectedRandomSerie.synopsis}
+                                acteurs={selectedRandomSerie.acteurs}
+                                realisateur={selectedRandomSerie.realisateur}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className='d-flex'>
+                          <div>
+                            <i></i>
+                          </div>
+                          <div className='dateSortieCard'>
+                            Date de sortie : {selectedRandomSerie.date_sortie}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
-            <div className='text-center'> Aucune série trouvée avec les filtres sélectionnés. </div>
-          )
-
-          }
-          <div className='divBtnChoixSerie d-flex justify-content-around'>
-            <button onClick={retour} className='btnRetourChoixSerie'><BsChevronDoubleLeft /> Retour  </button>
-            <button onClick={selectRandomSerie} disabled={seriesFiltrees.length <= 1} className='btnSuivantChoixSerie'> Propose moi une autre série <FaRandom /> </button>
+            <div className='noSerieDiv'>Aucune série trouvée avec les filtres sélectionnés.</div>
+          )}
+          <div className='divBtnChoix d-flex justify-content-around'>
+            <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
+            <button onClick={selectRandomSerie} disabled={seriesFiltrees.length <= 1} className='btnSuivantChoix'> Propose moi une autre série <FaRandom /></button>
           </div>
         </div>
       )}
     </div>
-
   )
-
 }
