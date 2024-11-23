@@ -30,7 +30,7 @@ export default function TrouverSerie() {
   const [seriesFiltrees, setSeriesFiltrees] = useState([])
 
   const [divVisible, setDivVisible] = useState("divChoixFiltres")
-  const [divVisibleMobile, setDivVisibleMobile] = useState("divChoixGenreserieMobile")
+  const [divVisibleMobile, setDivVisibleMobile] = useState("divChoixGenreSerieMobile")
   const [selectedRandomSerie, setSelectedRandomSerie] = useState(null)
 
   const isMobile = useIsMobile()
@@ -257,7 +257,7 @@ export default function TrouverSerie() {
 
   const retourMobile = () => {
     if (divVisibleMobile === "divChoixDateSerieMobile") {
-      setDivVisibleMobile("divChoixSerieMobile")
+      setDivVisibleMobile("divChoixGenreSerieMobile")
     } else if (divVisibleMobile === "divChoixScoreSerieMobile") {
       setDivVisibleMobile("divChoixDateSerieMobile")
     } else if (divVisibleMobile === "divSerieProposeMobile") {

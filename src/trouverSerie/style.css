@@ -566,11 +566,12 @@
 @media only screen and (max-width : 768px) {
 
   .btnChoix {
-      width: 40%;
+      width: 50%;
       height: 50px;
-      padding: 5px 11px;
-      font-size: 12px;
+      padding: 5px 5px;
+      font-size: 11px;
       display: inline-block;
+      font-weight: 800;
   }
 
   .mobileChoixFiltres {
