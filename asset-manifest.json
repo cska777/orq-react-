@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/orq-react-/static/css/main.0c33232d.css",
-    "main.js": "/orq-react-/static/js/main.a501613e.js",
+    "main.css": "/orq-react-/static/css/main.88893443.css",
+    "main.js": "/orq-react-/static/js/main.b8079530.js",
     "static/js/453.7b6acee0.chunk.js": "/orq-react-/static/js/453.7b6acee0.chunk.js",
     "static/media/ORQ_blanc.png": "/orq-react-/static/media/ORQ_blanc.d8e404fc0cd390c236a0.png",
     "index.html": "/orq-react-/index.html",
-    "main.0c33232d.css.map": "/orq-react-/static/css/main.0c33232d.css.map",
-    "main.a501613e.js.map": "/orq-react-/static/js/main.a501613e.js.map",
+    "main.88893443.css.map": "/orq-react-/static/css/main.88893443.css.map",
+    "main.b8079530.js.map": "/orq-react-/static/js/main.b8079530.js.map",
     "453.7b6acee0.chunk.js.map": "/orq-react-/static/js/453.7b6acee0.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0c33232d.css",
-    "static/js/main.a501613e.js"
+    "static/css/main.88893443.css",
+    "static/js/main.b8079530.js"
   ]
 }
