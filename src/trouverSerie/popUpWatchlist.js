@@ -34,7 +34,7 @@ export default function PopUpWatchlist({ selectedSerie }) {
         }else{
             await ajouterWatchlist(selectedSerie, user,token)
             setMessage("Serie ajoutée à la watchlist")
-            console.log(selectedSerie, ", Envoyé")
+            //console.log(selectedSerie, ", Envoyé")
         }
     }else{
         setMessage("Veuillez vous connecter pour ajouter cette série à votre watchlist")

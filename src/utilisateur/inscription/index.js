@@ -80,11 +80,11 @@ export default function Inscription() {
                 email,
                 password,
             })
-            console.log(response.data)
+            //console.log(response.data)
             navigate("/")
             
         }catch(error){
-            console.log(error)
+            console.error(error)
         }
         return true
     }

@@ -34,7 +34,7 @@ export default function PopUpWatchlist({ selectedFilm }) {
         }else{
             await ajouterWatchlist(selectedFilm, user,token)
             setMessage("Film ajouté à la watchlist")
-            console.log(selectedFilm, ", Envoyé")
+            //console.log(selectedFilm, ", Envoyé")
         }
     }else{
         setMessage("Veuillez vous connecter pour ajouter ce film à votre watchlist")
