@@ -1,70 +1,27 @@
-# Getting Started with Create React App
+# C'est quoi **ORQ** (_On Regarde Quoi ?_)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[**Accéder au site**] (https://cska777.github.io/orq-react-/)
 
-## Available Scripts
+"Alors on regarde quoi ?", une question qu'on se pose bien trop souvent, et voilà comment ORQ va vous faire gagner du temps !
 
-In the project directory, you can run:
+## Objectif
+**ORQ** est un projet qui a pour but de proposer des films et des séries en fonction des préférences renseignées par l'utilisateur. 
+Le site offre également à l'utilisateur une watchlist qu'il pourra personnaliser, avec des fonctionnalités tels que : 
+- Ajouter ou supprimer des oeuvres
+- Marquer les oeuvres qu'il a déjà vu ou non 
+- Attribuer une note aux films et séries présents dans sa _watchlist_
 
-### `npm start`
+## Technique
+Concernant la partie technique, la partie _frontend_ du site est codée avec React et hébergée via _Github Pages_, pour la partie _backend_ elle est développée avec Django et est hébergée sur _Railway_.
+La selection des oeuvres se fait à partir de la base de données du site TMDB, qui propose un large choix de films et séries.
+Vous pouvez retrouver les dépôts ici : 
+- Partie React, _https://github.com/cska777/orq-react-_
+- Partie Django, https://github.com/cska777/orq-django-
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## À venir
+Des améliorations arriveront par la suite :
+- La base de données est amenée à s'enrichir.
+- Des fonctionnalités permettant une expérience utilisateur plus personnalisée
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+En espérant que vous trouverez quoi regarder ! 🍿
