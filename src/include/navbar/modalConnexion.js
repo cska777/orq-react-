@@ -38,7 +38,6 @@ export function Connexion() {
             setIsModalOpen(false);
             navigate('/');
         } catch (error) {
-            console.log("Erreur de connexion : ", error);
             setErrorMessage("Les identifiants saisis sont incorrects.");
         }
     };

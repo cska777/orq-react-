@@ -26,7 +26,7 @@ export const useAppStore = create((set) => ({
 
                 // Mise à jour de la watchlist dans Zustand avec les données récupérées
                 set({ watchlist: response.data });
-                console.log("Watchlist récupérée : ", response.data)
+                // console.log("Watchlist récupérée : ", response.data)
             } catch (error) {
                 console.error("Erreur lors de la récupération de la watchlist")
             }
@@ -114,7 +114,7 @@ export const useAppStore = create((set) => ({
                             item.id === itemId ? { ...item, [propriete]: nvlleValeur } : item
                         )
                     }));
-                    console.log("Propriété mise à jour avec succès");
+                    //console.log("Propriété mise à jour avec succès");
                 }
             } catch (error) {
                 console.error("Erreur lors de la mise à jour de la propriété de la watchlist", error.response ? error.response.data : error.message);
@@ -139,7 +139,7 @@ export const useAppStore = create((set) => ({
                     set((state) => ({
                         watchlist: state.watchlist.filter(item => item.id !== itemId)
                     }));
-                    console.log("Oeuvre supprimée de la watchlist avec succès");
+                    //console.log("Oeuvre supprimée de la watchlist avec succès");
                 } else {
                     console.error(`Erreur inattendue lors de la suppression, code de statut : ${response.status}`);
                 }
@@ -171,7 +171,7 @@ export const useAppStore = create((set) => ({
                     }
                     return state;
                 });
-                console.log("User connecté : ", response.data)
+                //console.log("User connecté : ", response.data)
             } catch (error) {
                 console.error("Erreur lors de la récupéaration de l'user")
                 set({

@@ -56,7 +56,6 @@ export default function TrouverFilm() {
   }, [token, getWatchlist, getUserData])
 
   useEffect(() => {
-    console.log("Filtres :", filtres)
 
     // ------------------- Récupération des données ----------------------
     setFilms(jsonData)

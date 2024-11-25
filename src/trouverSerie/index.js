@@ -49,7 +49,6 @@ export default function TrouverSerie() {
   }, [token, getWatchlist, getUserData])
 
   useEffect(() => {
-    console.log("Filtres :", filtres)
 
     // ------------------------- Récupération des données -----------------
     setSeries(jsonData)
