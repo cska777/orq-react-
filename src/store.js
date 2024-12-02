@@ -73,25 +73,25 @@ export const useAppStore = create((set) => ({
                 press_score: item.note_user
             };
     
-        if (token) {
-            try {
-                const response = await axios.post(`${API_URL}/watchlist/`, data, {
-                    headers: {
-                        Authorization: `Token ${token}`
+            if (token) {
+                try {
+                    const response = await axios.post(`${API_URL}/watchlist/`, data, {
+                        headers: { Authorization: `Token ${token}` }
+                    });
+        
+                    if (response.status === 201) {
+                        const { getWatchlist} = useAppStore.getState()
+                        await getWatchlist(token);
+                        console.log(`${type} ajouté à la watchlist`);
                     }
-                });
-    
-                if (response.status === 201) {
-                    // Mise à jour de la watchlist
-                    set((state) => ({
-                        watchlist: [...state.watchlist, response.data]
-                    }));
-                    console.log(`${type.charAt(0).toUpperCase() + type.slice(1)} ajouté à la watchlist avec succès`);
+                } catch (error) {
+                    if (error.response && error.response.status === 409) {
+                        console.error(`${type} déjà présent dans la watchlist`);
+                    } else {
+                        console.error("Erreur lors de l'ajout :", error.message);
+                    }
                 }
-            } catch (error) {
-                console.error(`Erreur lors de l'ajout du ${type} à la watchlist`, error.response ? error.response.data : error.message);
             }
-        }
     },
     
     

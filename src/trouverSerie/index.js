@@ -628,7 +628,7 @@ export default function TrouverSerie() {
               </div>
             </div>
           ) : (
-            <div className='noSerieDiv'>Aucune série trouvée avec les filtres sélectionnés.</div>
+            <div className='noSerieDiv' style={{ color: "white"}}>Aucune série trouvée avec les filtres sélectionnés.</div>
           )}
           <div className='divBtnChoix d-flex justify-content-around'>
             <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>

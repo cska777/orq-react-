@@ -529,6 +529,10 @@
     position: relative;
 }
 
+.modalContentDescFilm h2{
+    color: black;
+}
+
 .closeBtnDescFilm {
     position: absolute;
     top: 10px;

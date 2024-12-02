@@ -3,9 +3,22 @@ import jsonDataFilm from "../asset/data/list_films.json"
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, EffectCoverflow, Keyboard, Virtual } from "swiper/modules"
 import "swiper/css"
+import { OeuvreDescription } from './popupCarousel'
 
 export function CarouselHome() {
   const [films, setFilms] = useState([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedOeuvre, setSelectedOeuvre] = useState(null)
+
+  const handleOeuvreClick = (oeuvre) => {
+    setSelectedOeuvre(oeuvre)
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setSelectedOeuvre(null)
+  }
 
   useEffect(() => {
     const shuffledFilms = [...jsonDataFilm].sort(() => Math.random() - 0.5).slice(0, 100)
@@ -13,8 +26,17 @@ export function CarouselHome() {
   }, [])
 
   return (
-    <Swiper
-    modules={[Autoplay,Virtual, Keyboard, EffectCoverflow]}
+    <><>
+      {isModalOpen && selectedOeuvre && (
+        <OeuvreDescription
+          titre={selectedOeuvre.titre}
+          synopsis={selectedOeuvre.synopsis}
+          realisateur={selectedOeuvre.realisateur}
+          acteurs={selectedOeuvre.acteurs}
+          date_sortie={selectedOeuvre.date_sortie}
+          onClose={closeModal} />)}
+    </><Swiper 
+      modules={[Autoplay, Virtual, Keyboard, EffectCoverflow]}
       className='swiper_container'
       autoplay={{
         delay: 2000,
@@ -24,16 +46,26 @@ export function CarouselHome() {
       slidesPerView={3}
       grabCursor={true}
       keyboard={{
-        enabled:true
+        enabled: true
       }}
       effect={"coverflow"}
       speed={1500}
     >
-      {films.map((oeuvre, index) => (
-        <SwiperSlide key={index}  className="swiper-slide-custom">
-          <img src={oeuvre.poster_url} alt={`Illustration de ${oeuvre.titre}`} className="illuCarouselHome" />
-        </SwiperSlide>
-      ))}
-    </Swiper>
+        {films.map((oeuvre, index) => (
+          <SwiperSlide 
+          key={index} 
+          className="swiper-slide-custom"
+          style={{ cursor : "pointer"}}
+          >
+            <img src={oeuvre.poster_url} alt={`Illustration de ${oeuvre.titre}`} className="illuCarouselHome" onClick={() => handleOeuvreClick(oeuvre)} />
+          </SwiperSlide>
+        ))}
+
+      </Swiper></>
+
+
+
   )
 }
+
+

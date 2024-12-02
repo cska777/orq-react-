@@ -1,15 +1,12 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useAppStore } from '../store'
-import { useIsMobile } from '../hook/useIsMobile'
 
 export default function PopUpWatchlist({ selectedSerie }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [message, setMessage] = useState('')
-    const isMobile = useIsMobile()
 
     // Récupération depuis Zustand
-    const {user, token, isAuth, watchlist, ajouterWatchlist, getUserData } = useAppStore()
+    const {user, isAuth, watchlist, ajouterWatchlist, getUserData } = useAppStore()
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token")
@@ -27,7 +24,10 @@ export default function PopUpWatchlist({ selectedSerie }) {
         }
 
         if(isAuth){
-            const serieExist = watchlist.some(serie => serie.titre === selectedSerie.titre)
+            const serieExist = watchlist.some(
+                serie => serie.titre.trim().toLowerCase() === selectedSerie.titre.trim().toLowerCase()
+            );
+            
 
         if(serieExist){
             setMessage("Cette série est déja dans votre watchlist")

@@ -749,6 +749,7 @@ export default function TrouverFilm() {
                                 synopsis={selectedRandomFilm.synopsis}
                                 acteurs={selectedRandomFilm.acteurs}
                                 realisateur={selectedRandomFilm.realisateur}
+                                date_sortie={selectedRandomFilm.date_sortie}
                               />
                             </div>
                           </div>
@@ -757,9 +758,7 @@ export default function TrouverFilm() {
                           <div>
                             <i></i>
                           </div>
-                          <div className='dateSortieCard'>
-                            Date de sortie : {selectedRandomFilm.date_sortie}
-                          </div>
+                         
                         </div>
                       </div>
                     </div>
@@ -768,7 +767,7 @@ export default function TrouverFilm() {
               </div>
             </div>
           ) : (
-            <div className='noFilmDiv'>Aucun film trouvé avec les filtres sélectionnés.</div>
+            <div className='noFilmDiv' style={{ color : "white"}}>Aucun film trouvé avec les filtres sélectionnés.</div>
           )}
           <div className='divBtnChoix d-flex justify-content-around'>
             <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>

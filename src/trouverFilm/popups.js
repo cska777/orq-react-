@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 // ----------------------- Popup synopsis voir + ------------------
-export function FilmDescription({ synopsis, realisateur, acteurs }) {
+export function FilmDescription({ synopsis, realisateur, acteurs, date_sortie }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const maxLength = 300;
 
@@ -36,6 +36,7 @@ export function FilmDescription({ synopsis, realisateur, acteurs }) {
                         <p>{synopsis}</p>
                         <p><span className='fw-bold'>Acteurs : </span>{acteurs.join(', ')}</p>
                         <p><span className='fw-bold'>Realisateur : </span>  {realisateur}</p>
+                        <p><span className='fw-bold'>Date de sortie : </span>  {date_sortie}</p>
                     </div>
                 </div>
             )}
