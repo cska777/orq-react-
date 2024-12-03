@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/orq-react-/static/css/main.4aaacab7.css",
+    "main.css": "/orq-react-/static/css/main.ca8cc1e8.css",
     "main.js": "/orq-react-/static/js/main.1c1f9028.js",
     "static/js/453.7b6acee0.chunk.js": "/orq-react-/static/js/453.7b6acee0.chunk.js",
     "static/media/ORQ_blanc.png": "/orq-react-/static/media/ORQ_blanc.d8e404fc0cd390c236a0.png",
     "index.html": "/orq-react-/index.html",
-    "main.4aaacab7.css.map": "/orq-react-/static/css/main.4aaacab7.css.map",
+    "main.ca8cc1e8.css.map": "/orq-react-/static/css/main.ca8cc1e8.css.map",
     "main.1c1f9028.js.map": "/orq-react-/static/js/main.1c1f9028.js.map",
     "453.7b6acee0.chunk.js.map": "/orq-react-/static/js/453.7b6acee0.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.4aaacab7.css",
+    "static/css/main.ca8cc1e8.css",
     "static/js/main.1c1f9028.js"
   ]
 }
