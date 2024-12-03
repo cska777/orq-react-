@@ -1,15 +1,12 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useAppStore } from '../store'
-import { useIsMobile } from '../hook/useIsMobile'
 
 export default function PopUpWatchlist({ selectedFilm }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [message, setMessage] = useState('')
-    const isMobile = useIsMobile()
 
     // Récupération depuis Zustand
-    const {user, token, isAuth, watchlist, ajouterWatchlist, getUserData } = useAppStore()
+    const {user, isAuth, watchlist, ajouterWatchlist, getUserData } = useAppStore()
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token")

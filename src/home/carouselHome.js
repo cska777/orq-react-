@@ -34,6 +34,7 @@ export function CarouselHome() {
           realisateur={selectedOeuvre.realisateur}
           acteurs={selectedOeuvre.acteurs}
           date_sortie={selectedOeuvre.date_sortie}
+          selectedOeuvre={selectedOeuvre}
           onClose={closeModal} />)}
     </><Swiper 
       modules={[Autoplay, Virtual, Keyboard, EffectCoverflow]}
