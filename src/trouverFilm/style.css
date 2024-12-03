@@ -639,5 +639,10 @@
 
     .btnSuivantChoix {
         font-size: 10px;
+        color: #000000;
+    }
+  
+    .btnRetourChoix {
+      color: #000000;
     }
 }
