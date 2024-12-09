@@ -179,7 +179,7 @@
 
 /* -------------------- Bouton Suivant -------------------------- */
 /* Bouton principal - fixé à un emplacement */
-.btnSuivantChoix {
+.btnSuivantChoix, .btnViteUneSerie{
   display: flex;
   justify-content: center;
   align-items: center;
@@ -252,7 +252,7 @@
 }
 
 /* ----------- Bouton Retour -------------- */
-.btnRetourChoix {
+.btnRetourChoix, .btnViteUneSerie {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -272,8 +272,12 @@
   opacity: 0.6;
 }
 
+.btnViteUneSerie{
+  width: 50%;
+}
 
-.btnRetourChoix:before {
+
+.btnRetourChoix:before, .btnViteUneSerie:before {
   content: "";
   position: absolute;
   left: 50%;
@@ -288,7 +292,7 @@
   z-index: -1;
 }
 
-.btnRetourChoix:after {
+.btnRetourChoix:after, .btnViteUneSerie:after {
   content: "";
   position: absolute;
   left: 55%;
@@ -303,7 +307,7 @@
   z-index: -1;
 }
 
-.btnRetourChoix:hover {
+.btnRetourChoix:hover, .btnViteUneSerie:hover {
   color: var(--font-color);
   border: 1px solid var(--btn-bg);
   font-weight: 700;
@@ -311,13 +315,13 @@
   opacity: 1;
 }
 
-.btnRetourChoix:hover:before {
+.btnRetourChoix:hover:before, .btnViteUneSerie:hover:before {
   top: -35%;
   background-color: var(--btn-bg);
   transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
 }
 
-.btnRetourChoix:hover:after {
+.btnRetourChoix:hover:after, .btnViteUneSerie:hover:after {
   top: -45%;
   background-color: var(--btn-bg);
   transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
@@ -331,7 +335,7 @@
 
 .btnSuivantChoix:disabled:hover,
 .btnSuivantChoix:disabled:before,
-.btnSuivantChoix:disabled:after {
+.btnSuivantChoix:disabled:after{
   border: 1px solid #4f4f4f;
   color: inherit;
   top: 100%;
@@ -527,6 +531,10 @@
   max-width: 500px;
   width: 80%;
   position: relative;
+}
+
+.modalContentDescSerie h2{
+  color: black;
 }
 
 .closeBtnDescSerie {

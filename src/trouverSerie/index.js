@@ -264,6 +264,13 @@ export default function TrouverSerie() {
     }
   }
 
+  const viteUneSerie = () => {
+    if(divVisibleMobile === "divChoixGenreSerieMobile"){
+      setDivVisibleMobile("divSerieProposeMobile")
+      selectRandomSerie()
+    }
+}
+
   return (
     <div className='containerFindSerie'>
       {isMobile ? (
@@ -284,6 +291,7 @@ export default function TrouverSerie() {
                 })}
               </div>
               <div className='divBtnChoixMobile'>
+                <button onClick={viteUneSerie} className='btnViteUneSerie'>Vite une série !</button>
                 <button onClick={suivantMobile} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
               </div>
             </div>

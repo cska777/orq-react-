@@ -316,6 +316,13 @@ export default function TrouverFilm() {
     }
   }
 
+  const viteUnFilm = () => {
+      if(divVisibleMobile === "divChoixGenreFilmMobile"){
+        setDivVisibleMobile("divFilmProposeMobile")
+        selectRandomFilm()
+      }
+  }
+
   return (
     <div className='containerFindFilm'>
       {isMobile ? (
@@ -336,6 +343,7 @@ export default function TrouverFilm() {
                   })}
               </div>
               <div className='divBtnChoixMobile'>
+                <button onClick={viteUnFilm} className='btnViteUnfilm'>Vite un film !</button>
                 <button onClick={suivantMobile} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
               </div>
             </div>
