@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import jsonDataFilm from "../asset/data/list_films.json"
+import jsonDataFilm from "../asset/data/movies_with_details.json"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Autoplay, EffectCoverflow, Keyboard, Virtual } from "swiper/modules"
 import { OeuvreDescription } from "./popupCarousel"
@@ -29,11 +29,11 @@ export function CarouselHomeMobile(){
         <><>
          {isModalOpen && selectedOeuvre && (
         <OeuvreDescription
-          titre={selectedOeuvre.titre}
-          synopsis={selectedOeuvre.synopsis}
-          realisateur={selectedOeuvre.realisateur}
-          acteurs={selectedOeuvre.acteurs}
-          date_sortie={selectedOeuvre.date_sortie}
+          titre={selectedOeuvre.title}
+          synopsis={selectedOeuvre.overview}
+          realisateur={selectedOeuvre.directors}
+          acteurs={selectedOeuvre.actors}
+          date_sortie={selectedOeuvre.releaseYear}
           selectedOeuvre={selectedOeuvre}
           onClose={closeModal} />)}
         </>

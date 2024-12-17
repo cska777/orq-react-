@@ -350,6 +350,7 @@
     background-repeat: repeat;
     position: relative;
     border-radius: 3%;
+    width: 90vw;
 }
 
 .containerFilmPropose:after {
@@ -457,7 +458,7 @@
     display: flex;
 }
 
-.genreDuree {
+.genre {
     display: flex;
     justify-content: space-between;
     color: rgb(176, 176, 176);
@@ -466,6 +467,8 @@
 
 .filmCardGenre {
     margin-left: 2%;
+    color: rgb(176, 176, 176);
+    font-size: 13px;
 }
 
 .descriptionRow {
@@ -474,16 +477,21 @@
     margin-right: 2%;
 }
 
-.dureeCardFilm {
+.duree {
     margin-right: 2%;
+    color: rgb(176, 176, 176);
+    font-size: 13px;
+    justify-content: space-between;
 }
 
 .noteFilmCard span {
-    color: #FFC53D;
+    color: #FFC53D
 }
 
 .noteFilmCard {
-    margin-left: 2%;
+    margin-right: 2%;
+    color: rgb(176, 176, 176);
+    font-size: 13px;
 }
 
 .dateSortieCard {
@@ -614,9 +622,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-    }
-
-    .containerFilmPropose {
         background: none;
         background-image: none;
         height: 100vh;

@@ -353,6 +353,7 @@
   background-repeat: repeat;
   position: relative;
   border-radius: 3%;
+  width: 90vw
 }
 
 .containerSeriePropose:after {
@@ -460,14 +461,18 @@
   display: flex;
 }
 
-.genreDuree {
+.nbSaisonNote {
   display: flex;
   justify-content: space-between;
   color: rgb(176, 176, 176);
   font-size: 13px;
+  margin-left: 2%;
+
 }
 
-.SerieCardGenre {
+.serieCardGenre {
+  color: rgb(176, 176, 176);
+  font-size: 13px;
   margin-left: 2%;
 }
 
@@ -486,7 +491,7 @@
 }
 
 .noteSerieCard {
-  margin-left: 2%;
+  margin-right: 2%;
 }
 
 .dateSortieCard {
@@ -618,12 +623,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
-  }
-
-  .containerSeriePropose {
       background: none;
       background-image: none;
       height: 100vh;
+      width: 100%;
   }
 
 

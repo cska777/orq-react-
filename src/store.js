@@ -41,21 +41,23 @@ export const useAppStore = create((set) => ({
     // Ajouter une oeuvre à la watchlist
     ajouterWatchlist: async (item, userData, token) => {
         // Déterminer le type automatiquement
-        const type = item.nb_saison ? "série" : "film";
+        const type = item.number_of_seasons ? "série" : "film";
     
         const data = type === "film"
             ? {
                 user_id: userData.id,
-                titre: item.titre,
+                titre: item.title,
                 illustration: item.poster_url,
                 vu: false,
                 a_regarder_plus_tard: true,
                 type: "film",
-                duree: item.duree_minutes,
-                date_sortie: item.date_sortie,
-                synopsis: item.synopsis,
+                duree: item.runtime,
+                date_sortie: item.releaseYear,
+                synopsis: item.overview,
                 genres: item.genres.join(", "),
-                press_score: item.note_user
+                realisateurs: item.directors.slice(0,5).join(", "),
+                acteurs: item.actors.slice(0,5).join(", "),
+                user_score: item.vote_average
             }
             : {
                 user_id: userData.id,
@@ -64,13 +66,13 @@ export const useAppStore = create((set) => ({
                 vu: false,
                 a_regarder_plus_tard: true,
                 type: "série",
-                date_sortie: item.date_sortie,
-                nb_saison: item.nbSaison,
-                synopsis: item.synopsis,
+                date_sortie: item.releaseYear,
+                nb_saison: item.number_of_seasons,
+                synopsis: item.overview,
                 genres: item.genres.join(", "),
-                realisateur: item.realisateur.join(", "),
-                acteurs: item.acteurs.join(", "),
-                press_score: item.note_user
+                realisateurs: item.directors.join(", "),
+                acteurs: item.actors.join(", "),
+                user_score: item.vote_average
             };
     
             if (token) {

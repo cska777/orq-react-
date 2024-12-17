@@ -33,9 +33,24 @@ export function SerieDescription({ synopsis, realisateur, acteurs }) {
                     <div className='modalContentDescSerie'>
                         <span className='closeBtnDescSerie' onClick={toggleModalSerie}>&times;</span>
                         <h2>Synopsis complet</h2>
-                        <p>{synopsis}</p>
-                        <p><span className='fw-bold'>Acteurs : </span>{acteurs.join(', ')}</p>
-                        <p><span className='fw-bold'>Realisateur : </span>  {realisateur}</p>
+                        {synopsis ? (
+                            <p>{synopsis}</p>
+                        ) : (
+                            <p><span className='font-italic'>Synopsis non disponible</span></p>
+                        )}
+
+                        {acteurs.length > 0 ? (
+                            <p><span className='fw-bold'>Acteurs : </span>{acteurs.join(', ')}</p>
+                        ) : (
+                            <p><span className='fw-bold'>Acteurs : </span> <span className='font-italic'>Information non disponible</span></p>
+                        )}
+
+                        {realisateur.length > 0 ? (
+                            <p><span className='fw-bold'>Realisateur(s) : </span>  {realisateur.join(', ')}</p>
+                        ) : (
+                            <p><span className='fw-bold'>Realisateur(s) : </span> <span className='font-italic'>Information non disponible</span></p>
+                        )}
+
                     </div>
                 </div>
             )}

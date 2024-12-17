@@ -15,7 +15,6 @@ export default function Watchlist() {
   // Utilisation des méthodes et états du store
   const watchlist = useAppStore((state) => state.watchlist)
   const getWatchlist = useAppStore((state) => state.getWatchlist)
-  const user = useAppStore((state) => state.user)
   const getUserData = useAppStore((state) => state.getUserData)
   const isAuth = useAppStore((state) => state.isAuth)
   const modifPropWatchlist = useAppStore((state) => state.modifPropWatchlist)
@@ -73,7 +72,7 @@ export default function Watchlist() {
         oeuvre.genres.split(",").forEach(genre => genresSet.add(genre.trim()));
       }
     });
-    return [...genresSet];
+    setGenres(Array.from(genresSet))
   }
 
   // Extraction des titres pour proposition dynamique de la recherche
@@ -209,12 +208,14 @@ export default function Watchlist() {
         <PopupWatchlistDetail
           illustration={selectedOeuvre.illustration}
           titre={selectedOeuvre.titre}
-          press_score={selectedOeuvre.press_score}
+          press_score={selectedOeuvre.user_score}
           genres={selectedOeuvre.genres}
           date_sortie={selectedOeuvre.date_sortie}
           synopsis={selectedOeuvre.synopsis}
           onClose={() => setOpenCardIndex(null)}
           noteUtilisateur={selectedOeuvre.note_utilisateur}
+          acteurs={selectedOeuvre.actors}
+          realisateurs={selectedOeuvre.directors}
         />
       )}
       <Stack spacing={2} className='pagination-container'>

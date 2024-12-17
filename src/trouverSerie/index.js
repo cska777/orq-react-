@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import jsonData from '../asset/data/list_series_backup.json'
+import jsonData from '../asset/data/series_with_seasons.json'
 import './style.css'
 import { useAppStore } from '../store'
 import { useIsMobile } from '../hook/useIsMobile'
@@ -17,6 +17,7 @@ export default function TrouverSerie() {
   const getWatchlist = useAppStore((state) => state.getWatchlist)
   const getUserData = useAppStore((state) => state.getUserData)
 
+
   const token = localStorage.getItem("token")
 
   const [historique, setHistorique] = useState([])
@@ -26,7 +27,7 @@ export default function TrouverSerie() {
   const [choixNote, setChoixNote] = useState([])
 
   const [genresUnique, setGenresUnique] = useState([])
-  const [noteUnique, setNoteUnique] = useState([])
+
   const [seriesFiltrees, setSeriesFiltrees] = useState([])
 
   const [divVisible, setDivVisible] = useState("divChoixFiltres")
@@ -41,6 +42,7 @@ export default function TrouverSerie() {
     note: [],
   })
 
+
   useEffect(() => {
     if (token) {
       getWatchlist(token) // Récup de la watchlist
@@ -51,8 +53,15 @@ export default function TrouverSerie() {
   useEffect(() => {
 
     // ------------------------- Récupération des données -----------------
-    setSeries(jsonData)
+    const processSeriesData = (data) => {
+      return data.map((serie) => ({
+        ...serie,
+        vote_average: serie.vote_average / 2, // Divise la note par 2
+      }));
+    };
+    setSeries(processSeriesData(jsonData))
   }, [filtres])
+
 
   useEffect(() => {
     // ---------------- Extraction des genres uniques -------------
@@ -73,22 +82,6 @@ export default function TrouverSerie() {
       extraireGenreUnique()
     }
 
-    // ------------------------- Extraction notes unique --------------------
-    const extraireNoteUnique = () => {
-      const uniqueNote = []
-      for (let serie of series) {
-        if (serie.note_user) {
-          if (!uniqueNote.includes(serie.note_user)) {
-            uniqueNote.push(serie.note_user)
-          }
-        }
-      }
-      setNoteUnique(uniqueNote)
-    }
-
-    if (series.length > 0) {
-      extraireNoteUnique()
-    }
   }, [series])
 
   // --------------------- Choix genre ------------------------
@@ -153,8 +146,25 @@ export default function TrouverSerie() {
   }
 
   // --------------------------- Choix Note ----------------------------
-  const choisirNote = (noteSelectionnee) => {
-    const index = choixNote.indexOf(noteSelectionnee)
+  const trancheNoteIndex = (trancheNoteSelectionnee) => {
+    for (let i = 0; i < choixNote.length; i++) {
+      if (trancheEgalesNote(choixNote[i], trancheNoteSelectionnee)) {
+        return i // Si la tranche est trouvée
+      }
+    }
+    return -1 // Si la tranche n'est pas trouvée
+  }
+
+  const trancheEgalesNote = (tranche1, tranche2) => {
+    return tranche1.debut === tranche2.debut && tranche1.fin === tranche2.fin
+  }
+
+  const isTrancheNoteSelected = (tranche) => {
+    return choixNote.some((t) => t.debut === tranche.debut && t.fin === tranche.fin)
+  }
+
+  const choisirTrancheNote = (trancheNoteSelectionnee) => {
+    const index = trancheNoteIndex(trancheNoteSelectionnee)
 
     if (index > -1) {
       const newChoixNote = [...choixNote]
@@ -165,50 +175,49 @@ export default function TrouverSerie() {
       newFiltres.note.splice(index, 1)
       setFiltres(newFiltres)
     } else {
-      const newChoixNote = [...choixNote, noteSelectionnee]
+      const newChoixNote = [...choixNote, trancheNoteSelectionnee]
+      const newFiltres = { ...filtres, note: [...filtres.note, trancheNoteSelectionnee] } // Ajout de la tranche sélectionnée
+
       setChoixNote(newChoixNote)
-
-      const newFiltres = { ...filtres, note: [...filtres.note, noteSelectionnee] }
       setFiltres(newFiltres)
-
     }
   }
 
   // ------------------------- Watchlist -----------------------
-  const isSerieWatchlist = (serie) => {
-    return watchlist.some((entry) => entry.titre === serie.titre)
-  };
+  const isSerieWatchlist = React.useCallback((serie) => {
+    return watchlist.some((entry) => entry.name === serie.name);
+  }, [watchlist]);
 
   // ------------------------ Historique ------------------------
-  const isSerieHistorique = (serie) => {
-    return historique.some((entry) => entry.titre === serie.titre)
-  };
+  const isSerieHistorique = React.useCallback((serie) => {
+    return historique.some((entry) => entry.name === serie.name)
+  }, [historique]);
 
-  // ----------------------- Filtrage ilm ------------------------
+  // ----------------------- Filtrage Serie ------------------------
   useEffect(() => {
     const filteredSeries = series.filter((serie) => {
       return (
         (filtres.genre.length === 0 || filtres.genre.some((genre) => serie.genres.includes(genre))) &&
 
-        (filtres.dateSortie.length === 0 || filtres.dateSortie.some((tranche) => serie.date_sortie >= tranche.debut && serie.date_sortie <= tranche.fin)) &&
+        (filtres.dateSortie.length === 0 || filtres.dateSortie.some((tranche) => serie.releaseYear >= tranche.debut && serie.releaseYear <= tranche.fin)) &&
 
-        (filtres.note.length === 0 || filtres.note.includes(serie.note_user)) &&
-
+        (filtres.note.length === 0 || filtres.note.some((tranche) =>
+          serie.vote_average >= tranche.debut && serie.vote_average <= tranche.fin
+        )) &&
 
         !isSerieWatchlist(serie) && !isSerieHistorique(serie)
       )
     })
     setSeriesFiltrees(filteredSeries)
 
-
     // Sélection du serie aléatoire parmi les series filtrés
     if (filteredSeries.length > 0) {
-      const randomIndex = Math.floor(Math.random() * filteredSeries.length)
-      setSelectedRandomSerie(filteredSeries[randomIndex])
+      const randomIndex = Math.floor(Math.random() * filteredSeries.length);
+      setSelectedRandomSerie(filteredSeries[randomIndex]);
     } else {
-      setSelectedRandomSerie(null)
+      console.warn("Aucune série disponible après filtrage."); // Ajouter un log pour le cas vide
     }
-  }, [filtres, series, watchlist, historique])
+  }, [filtres, series, watchlist, historique, isSerieHistorique, isSerieWatchlist])
 
 
   // ------------ Fonction de sélection aléatoire -----------------
@@ -222,6 +231,7 @@ export default function TrouverSerie() {
 
     setHistorique([...historique, selectedRandomSerie])
     setSelectedRandomSerie(selectedRandomSerie)
+
 
     return selectedRandomSerie
   }
@@ -265,11 +275,11 @@ export default function TrouverSerie() {
   }
 
   const viteUneSerie = () => {
-    if(divVisibleMobile === "divChoixGenreSerieMobile"){
+    if (divVisibleMobile === "divChoixGenreSerieMobile") {
       setDivVisibleMobile("divSerieProposeMobile")
       selectRandomSerie()
     }
-}
+  }
 
   return (
     <div className='containerFindSerie'>
@@ -296,7 +306,6 @@ export default function TrouverSerie() {
               </div>
             </div>
           )}
-
 
           {divVisibleMobile === "divChoixDateSerieMobile" && (
             <div id='divChoixDateSerieMobile'>
@@ -357,17 +366,27 @@ export default function TrouverSerie() {
           {divVisibleMobile === "divChoixScoreSerieMobile" && (
             <div id='divChoixScoreSerieMobile'>
               <div className='btnSelecSerieMobile'>
-                {noteUnique.map((note, index) => {
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => choisirNote(note)}
-                      className={`btnChoix ${choixNote.includes(note) ? 'selectedSerie' : 'unselected'}`}
-                    >
-                      {note} <RiStarFill />
-                    </button>
-                  );
-                })}
+                {[
+                  { debut: 0, fin: 1.9, label: 1 },
+                  { debut: 2, fin: 2.9, label: 2 },
+                  { debut: 3, fin: 3.9, label: 3 },
+                  { debut: 4, fin: 4.9, label: 4 },
+                  { debut: 5, fin: 5, label: 5 }
+                ].map((tranche) => (
+                  <button
+                    key={tranche.label}
+                    onClick={() => {
+                      choisirTrancheNote(tranche)
+                    }}
+                    className={`btnChoix ${(() => {
+                      const isSelected = isTrancheNoteSelected(tranche);
+                      return isSelected ? 'selectedSerie' : 'unselected';
+                    })()
+                      }`}
+                  >
+                    {tranche.label} <RiStarFill />
+                  </button>
+                ))}
               </div>
               <div className='divBtnChoixMobile'>
                 <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
@@ -389,39 +408,53 @@ export default function TrouverSerie() {
                         <div className='movieImg' style={{ "--bg-image-movie": `url(${selectedRandomSerie.poster_url})` }}></div>
                         <div className='cardInfoText'>
                           <div className='mr-grid'>
-                            <h1>{selectedRandomSerie.titre}</h1>
-                            <div className='col1 genreDuree'>
-                              <p className='serieCardGenre'>
-                                {selectedRandomSerie.genres.join(", ")}
-                              </p>
-                              {selectedRandomSerie.duree_minutes === null ? (
-                                <p className='dureeCardSerie'>Durée non renseignée</p>
+                            <h1>{selectedRandomSerie.name}</h1>
+                            <div className='col1 nbSaisonNote'>
+                              {selectedRandomSerie.number_of_seasons === null ? (
+                                <p className='dureeCardSerie'>Nombre de saison : indisponible</p>
                               ) : (
                                 <p className='dureeCardSerie'>
-                                 
+                                  {selectedRandomSerie.number_of_seasons > 1 ? `${selectedRandomSerie.number_of_seasons} saisons` : `${selectedRandomSerie.number_of_seasons} saison`}
                                 </p>
                               )}
                               <p className='noteSerieCard'>
-                                {selectedRandomSerie.note_user} <span><RiStarFill /></span>
+                                {selectedRandomSerie.vote_average > 0 ? (
+                                  <>{selectedRandomSerie.vote_average.toFixed(1)} < span > <RiStarFill /></span></>
+                                )
+                                  : (
+                                    <p>Aucune évalutation</p>
+                                  )}
+
                               </p>
                             </div>
                             <div className='mr-grid'>
                               <div className='col1'>
-                                <div className='SerieCardDesc'>
+                                <div className='serieCardDesc'>
                                   <SerieDescription
-                                    synopsis={selectedRandomSerie.synopsis}
-                                    acteurs={selectedRandomSerie.acteurs}
-                                    realisateur={selectedRandomSerie.realisateur}
+                                    synopsis={selectedRandomSerie.overview}
+                                    acteurs={selectedRandomSerie.actors}
+                                    realisateur={selectedRandomSerie.directors}
                                   />
                                 </div>
                               </div>
                             </div>
+                            <div className='genreDiv'>
+                              {selectedRandomSerie.genres.length > 0 ? (
+                                <p className='serieCardGenre'>
+                                  {selectedRandomSerie.genres.join(", ")}
+                                </p>
+                              ) : (
+                                <p className='serieCardGenre'>Genres : information non disponible</p>
+                              )}
+
+                            </div>
+
                             <div className='d-flex'>
                               <div>
                                 <i></i>
                               </div>
                               <div className='dateSortieCard'>
-                                Date de sortie : {selectedRandomSerie.date_sortie}
+                                Date de sortie : {selectedRandomSerie.releaseYear}
                               </div>
                             </div>
                           </div>
@@ -431,7 +464,7 @@ export default function TrouverSerie() {
                   </div>
                 </div>
               ) : (
-                <div className='noSerieDiv'>Aucune série trouvée avec les filtres sélectionnés.</div>
+                <div className='noSerieDiv' style={{ color: "white" }}>Aucune série trouvée avec les filtres sélectionnés.</div>
               )}
               <div className='divBtnChoix d-flex justify-content-around'>
                 <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
@@ -483,11 +516,11 @@ export default function TrouverSerie() {
                         return (
                           <li key={index}>
                             {
-                              dateSortie.debut === 0 ? "Sortie avant 1980" :
-                                dateSortie.debut === 1980 ? "Date de sortie entre 1980 et 1999" :
-                                  dateSortie.debut === 2000 ? "Date de sortie entre 2000 et 2009" :
-                                    dateSortie.debut === 2010 ? "Date de sortie entre 2010 et 2019" :
-                                      dateSortie.debut === 2020 ? "Sortie après 2019" :
+                              dateSortie.debut === 0 ? <>Sortie avant <strong>1980</strong></> :
+                                dateSortie.debut === 1980 ? <>Date de sortie entre <strong>1980 et 1999</strong> </> :
+                                  dateSortie.debut === 2000 ? <>Date de sortie entre <strong>2000 et 2009</strong></> :
+                                    dateSortie.debut === 2010 ? <>Date de sortie entre <strong>2010 et 2019</strong></> :
+                                      dateSortie.debut === 2020 ? <>Sortie après <strong>2019</strong></> :
                                         ""
                             }
                           </li>
@@ -552,26 +585,38 @@ export default function TrouverSerie() {
                   <h2>Note : </h2>
                   {filtres.note.length > 0 ? (
                     <ul>
-                      {filtres.note.map((note, index) => {
-                        return <li key={index}> {note} <RiStarFill /> </li>
-                      })}
+                      {filtres.note.sort((a, b) => a.debut - b.debut).map((tranche, index) => (
+                        <li key={index}>
+                          {tranche.debut} - {tranche.fin} <RiStarFill />
+                        </li>
+                      ))}
                     </ul>
                   ) : (
                     <p>Selectionnez un ou plusieurs filtres</p>
                   )}
                 </div>
                 <div className='divBtnSelecSerie'>
-                  {noteUnique.map((note, index) => {
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => choisirNote(note)}
-                        className={`btnChoix ${choixNote.includes(note) ? 'selectedSerie' : 'unselected'}`}
-                      >
-                        {note} <RiStarFill />
-                      </button>
-                    );
-                  })}
+                  {[
+                    { debut: 0, fin: 1.9, label: 1 },
+                    { debut: 2, fin: 2.9, label: 2 },
+                    { debut: 3, fin: 3.9, label: 3 },
+                    { debut: 4, fin: 4.9, label: 4 },
+                    { debut: 5, fin: 5, label: 5 }
+                  ].map((tranche) => (
+                    <button
+                      key={tranche.label}
+                      onClick={() => {
+                        choisirTrancheNote(tranche)
+                      }}
+                      className={`btnChoix ${(() => {
+                        const isSelected = isTrancheNoteSelected(tranche);
+                        return isSelected ? 'selectedSerie' : 'unselected';
+                      })()
+                        }`}
+                    >
+                      {tranche.label} <RiStarFill />
+                    </button>
+                  ))}
                 </div>
               </div>
               <div className='divBtnChoix d-flex justify-content-around'>
@@ -580,53 +625,70 @@ export default function TrouverSerie() {
             </div>
           )}
         </>
-      )}
-      {divVisible === "divSeriePropose" && (
-        <div id='divSeriePropose'>
-          {selectedRandomSerie ? (
-            <div className='containerSeriePropose' style={{ "--bg-image": `url(${selectedRandomSerie.poster_url})` }}>
-              <div className='containerCardInfos'>
-                <div className='telephoneContainer'>
-                  <div className='movie'>
-                    <div className='movieMenu'>
-                      <PopUpWatchlist selectedSerie={selectedRandomSerie} />
-                    </div>
-                    <div className='movieImg' style={{ "--bg-image-movie": `url(${selectedRandomSerie.poster_url})` }}></div>
-                    <div className='cardInfoText'>
-                      <div className='mr-grid'>
-                        <h1>{selectedRandomSerie.titre}</h1>
-                        <div className='col1 genreDuree'>
-                          <p className='serieCardGenre'>
-                            {selectedRandomSerie.genres.join(", ")}
-                          </p>
-                          {selectedRandomSerie.duree_minutes === null ? (
-                            <p className='dureeCardSerie'>Durée non renseignée</p>
-                          ) : (
-                            <p className='dureeCardSerie'>
-                             
-                            </p>
-                          )}
-                          <p className='noteSerieCard'>
-                            {selectedRandomSerie.note_user} <span><RiStarFill /></span>
-                          </p>
-                        </div>
+      )
+      }
+      {
+        divVisible === "divSeriePropose" && (
+          <div id='divSeriePropose'>
+            {selectedRandomSerie ? (
+              <div className='containerSeriePropose' style={{ "--bg-image": `url(${selectedRandomSerie.poster_url})` }}>
+                <div className='containerCardInfos'>
+                  <div className='telephoneContainer'>
+                    <div className='movie'>
+                      <div className='movieMenu'>
+                        <PopUpWatchlist selectedSerie={selectedRandomSerie} />
+                      </div>
+                      <div className='movieImg' style={{ "--bg-image-movie": `url(${selectedRandomSerie.poster_url})` }}></div>
+                      <div className='cardInfoText'>
                         <div className='mr-grid'>
-                          <div className='col1'>
-                            <div className='serieCardDesc'>
-                              <SerieDescription
-                                synopsis={selectedRandomSerie.synopsis}
-                                acteurs={selectedRandomSerie.acteurs}
-                                realisateur={selectedRandomSerie.realisateur}
-                              />
+                          <h1>{selectedRandomSerie.name}</h1>
+                          <div className='col1 nbSaisonNote'>
+                            {selectedRandomSerie.number_of_seasons === null ? (
+                              <p className='dureeCardSerie'>Nombre de saison : indisponible</p>
+                            ) : (
+                              <p className='dureeCardSerie'>
+                                {selectedRandomSerie.number_of_seasons > 1 ? `${selectedRandomSerie.number_of_seasons} saisons` : `${selectedRandomSerie.number_of_seasons} saison`}
+                              </p>
+                            )}
+                            <p className='noteSerieCard'>
+                              {selectedRandomSerie.vote_average > 0 ? (
+                                <>{selectedRandomSerie.vote_average.toFixed(1)} < span > <RiStarFill /></span></>
+                              )
+                                : (
+                                  <p>Aucune évalutation</p>
+                                )}
+
+                            </p>
+                          </div>
+                          <div className='mr-grid'>
+                            <div className='col1'>
+                              <div className='serieCardDesc'>
+                                <SerieDescription
+                                  synopsis={selectedRandomSerie.overview}
+                                  acteurs={selectedRandomSerie.actors}
+                                  realisateur={selectedRandomSerie.directors}
+                                />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className='d-flex'>
-                          <div>
-                            <i></i>
+                          <div className='genreDiv'>
+                            {selectedRandomSerie.genres.length > 0 ? (
+                              <p className='serieCardGenre'>
+                                {selectedRandomSerie.genres.join(", ")}
+                              </p>
+                            ) : (
+                              <p className='serieCardGenre'>Genres : information non disponible</p>
+                            )}
+
                           </div>
-                          <div className='dateSortieCard'>
-                            Date de sortie : {selectedRandomSerie.date_sortie}
+
+                          <div className='d-flex'>
+                            <div>
+                              <i></i>
+                            </div>
+                            <div className='dateSortieCard'>
+                              Date de sortie : {selectedRandomSerie.releaseYear}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -634,16 +696,16 @@ export default function TrouverSerie() {
                   </div>
                 </div>
               </div>
+            ) : (
+              <div className='noSerieDiv' style={{ color: "white" }}>Aucune série trouvée avec les filtres sélectionnés.</div>
+            )}
+            <div className='divBtnChoix d-flex justify-content-around'>
+              <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
+              <button onClick={selectRandomSerie} disabled={seriesFiltrees.length <= 1} className='btnSuivantChoix'> Propose moi une autre série <FaRandom /></button>
             </div>
-          ) : (
-            <div className='noSerieDiv' style={{ color: "white"}}>Aucune série trouvée avec les filtres sélectionnés.</div>
-          )}
-          <div className='divBtnChoix d-flex justify-content-around'>
-            <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
-            <button onClick={selectRandomSerie} disabled={seriesFiltrees.length <= 1} className='btnSuivantChoix'> Propose moi une autre série <FaRandom /></button>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   )
 }

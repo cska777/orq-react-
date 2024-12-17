@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import jsonData from '../asset/data/list_films.json'
+import jsonData from '../asset/data/movies_with_details.json'
 import { BsChevronDoubleLeft, BsChevronDoubleRight } from "react-icons/bs";
 import { FaRandom } from "react-icons/fa"
 import { RiStarFill } from "react-icons/ri"
@@ -26,7 +26,6 @@ export default function TrouverFilm() {
   const [choixDuree, setChoixDuree] = useState([])
 
   const [genresUnique, setGenresUnique] = useState([])
-  const [noteUnique, setNoteUnique] = useState([])
   const [filmsFiltres, setFilmsFiltres] = useState([])
 
   const [divVisible, setDivVisible] = useState("divChoixFiltres")
@@ -56,10 +55,15 @@ export default function TrouverFilm() {
   }, [token, getWatchlist, getUserData])
 
   useEffect(() => {
-    //console.log("Filtres :", filtres)
 
-    // ------------------- Récupération des données ----------------------
-    setFilms(jsonData)
+    // ------------------------- Récupération des données -----------------
+    const processFilmsData = (data) => {
+      return data.map((film) => ({
+        ...film,
+        vote_average: film.vote_average / 2, // Divise la note par 2
+      }));
+    };
+    setFilms(processFilmsData(jsonData))
   }, [filtres])
 
 
@@ -80,22 +84,6 @@ export default function TrouverFilm() {
     }
     if (films.length > 0) {
       extraireGenreUnique()
-    }
-    // ------------------ Extraction notes unique ----------------------
-    const extraireNoteUnique = () => {
-      const uniqueNote = [];
-      for (let film of films) {
-        if (film.note_user) {
-          if (!uniqueNote.includes(film.note_user)) {
-            uniqueNote.push(film.note_user);
-          }
-        }
-      }
-      setNoteUnique(uniqueNote);
-    };
-
-    if (films.length > 0) {
-      extraireNoteUnique();
     }
   }, [films])
 
@@ -199,10 +187,26 @@ export default function TrouverFilm() {
     }
   }
 
-  // -------------------------- Choix note -------------------------
+  // --------------------------- Choix Note ----------------------------
+  const trancheNoteIndex = (trancheNoteSelectionnee) => {
+    for (let i = 0; i < choixNote.length; i++) {
+      if (trancheEgalesNote(choixNote[i], trancheNoteSelectionnee)) {
+        return i // Si la tranche est trouvée
+      }
+    }
+    return -1 // Si la tranche n'est pas trouvée
+  }
 
-  const choisirNote = (noteSelectionnee) => {
-    const index = choixNote.indexOf(noteSelectionnee)
+  const trancheEgalesNote = (tranche1, tranche2) => {
+    return tranche1.debut === tranche2.debut && tranche1.fin === tranche2.fin
+  }
+
+  const isTrancheNoteSelected = (tranche) => {
+    return choixNote.some((t) => t.debut === tranche.debut && t.fin === tranche.fin)
+  }
+
+  const choisirTrancheNote = (trancheNoteSelectionnee) => {
+    const index = trancheNoteIndex(trancheNoteSelectionnee)
 
     if (index > -1) {
       const newChoixNote = [...choixNote]
@@ -213,24 +217,23 @@ export default function TrouverFilm() {
       newFiltres.note.splice(index, 1)
       setFiltres(newFiltres)
     } else {
-      const newChoixNote = [...choixNote, noteSelectionnee]
+      const newChoixNote = [...choixNote, trancheNoteSelectionnee]
+      const newFiltres = { ...filtres, note: [...filtres.note, trancheNoteSelectionnee] } // Ajout de la tranche sélectionnée
+
       setChoixNote(newChoixNote)
-
-      const newFiltres = { ...filtres, note: [...filtres.note, noteSelectionnee] }
       setFiltres(newFiltres)
-
     }
   }
 
   // ------------------------- Watchlist -----------------------
-  const isFilmWatchlist = (film) => {
-    return watchlist.some((entry) => entry.titre === film.titre)
-  };
+  const isFilmWatchlist = React.useCallback((film) => {
+    return watchlist.some((entry) => entry.title === film.title);
+  }, [watchlist]);
 
   // ------------------------ Historique ------------------------
-  const isFilmHistorique = (film) => {
-    return historique.some((entry) => entry.titre === film.titre)
-  };
+  const isFilmHistorique = React.useCallback((film) => {
+    return historique.some((entry) => entry.title === film.title);
+  }, [historique]);
 
   // ----------------------- Filtrage film ------------------------
   useEffect(() => {
@@ -238,11 +241,11 @@ export default function TrouverFilm() {
       return (
         (filtres.genre.length === 0 || filtres.genre.some((genre) => film.genres.includes(genre))) &&
 
-        (filtres.dateSortie.length === 0 || filtres.dateSortie.some((tranche) => film.date_sortie >= tranche.debut && film.date_sortie <= tranche.fin)) &&
+        (filtres.dateSortie.length === 0 || filtres.dateSortie.some((tranche) => film.releaseYear >= tranche.debut && film.releaseYear <= tranche.fin)) &&
 
-        (filtres.note.length === 0 || filtres.note.includes(film.note_user)) &&
+        (filtres.note.length === 0 || filtres.note.some((tranche) => film.vote_average >= tranche.debut && film.vote_average <= tranche)) &&
 
-        (filtres.duree.length === 0 || filtres.duree.some((tranche) => film.duree_minutes >= tranche.debut && film.duree_minutes <= tranche.fin)) &&
+        (filtres.duree.length === 0 || filtres.duree.some((tranche) => film.runtime >= tranche.debut && film.runtime <= tranche.fin)) &&
 
         !isFilmWatchlist(film) && !isFilmHistorique(film)
       )
@@ -255,9 +258,9 @@ export default function TrouverFilm() {
       const randomIndex = Math.floor(Math.random() * filteredFilms.length)
       setSelectedRandomFilm(filteredFilms[randomIndex])
     } else {
-      setSelectedRandomFilm(null)
+      console.warn("Aucun film trouvé avec les filtres sélectionnés")
     }
-  }, [filtres, films, watchlist, historique])
+  }, [filtres, films, watchlist, historique, isFilmHistorique, isFilmWatchlist])
 
   // ------------ Fonction de sélection aléatoire -----------------
   const selectRandomFilm = () => {
@@ -317,10 +320,10 @@ export default function TrouverFilm() {
   }
 
   const viteUnFilm = () => {
-      if(divVisibleMobile === "divChoixGenreFilmMobile"){
-        setDivVisibleMobile("divFilmProposeMobile")
-        selectRandomFilm()
-      }
+    if (divVisibleMobile === "divChoixGenreFilmMobile") {
+      setDivVisibleMobile("divFilmProposeMobile")
+      selectRandomFilm()
+    }
   }
 
   return (
@@ -330,17 +333,17 @@ export default function TrouverFilm() {
           {divVisibleMobile === "divChoixGenreFilmMobile" && (
             <div id='divChoixGenreFilmMobile'>
               <div className='btnSelecFilmMobile'>
-              {genresUnique.map((genre, index) => {
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => choisirGenre(genre)}
-                        className={`btnChoix ${choixGenre.includes(genre) ? 'selectedFilm' : 'unselected'}`}
-                      >
-                        {genre}
-                      </button>
-                    );
-                  })}
+                {genresUnique.map((genre, index) => {
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => choisirGenre(genre)}
+                      className={`btnChoix ${choixGenre.includes(genre) ? 'selectedFilm' : 'unselected'}`}
+                    >
+                      {genre}
+                    </button>
+                  );
+                })}
               </div>
               <div className='divBtnChoixMobile'>
                 <button onClick={viteUnFilm} className='btnViteUnfilm'>Vite un film !</button>
@@ -352,34 +355,34 @@ export default function TrouverFilm() {
           {divVisibleMobile === "divChoixDureeFilmMobile" && (
             <div id='divChoixDureeFilmMobile'>
               <div className='btnSelecFilmMobile'>
-              {[{ debut: 0, fin: 89 }].map((tranche, index) => (
-                    <button
-                      key={index}
-                      onClick={() => choisirTrancheDuree(tranche)}
-                      className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-                    >
-                      Moins de 1h30
-                    </button>
-                  ))}
-                  {[{ debut: 90, fin: 120 }].map((tranche, index) => (
-                    <button
-                      key={index}
-                      onClick={() => choisirTrancheDuree(tranche)}
-                      className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-                    >
-                      1h30 - 2h
-                    </button>
-                  ))}
-                  {[{ debut: 121, fin: Infinity }].map((tranche, index) => (
-                    <button
-                      key={index}
-                      onClick={() => choisirTrancheDuree(tranche)}
-                      className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-                    >
-                      Plus de 2h
-                    </button>
-                  ))}
-                </div>
+                {[{ debut: 0, fin: 89 }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDuree(tranche)}
+                    className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                  >
+                    Moins de 1h30
+                  </button>
+                ))}
+                {[{ debut: 90, fin: 120 }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDuree(tranche)}
+                    className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                  >
+                    1h30 - 2h
+                  </button>
+                ))}
+                {[{ debut: 121, fin: Infinity }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDuree(tranche)}
+                    className={`btnChoix ${isTrancheDureeSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                  >
+                    Plus de 2h
+                  </button>
+                ))}
+              </div>
               <div className='divBtnChoixMobile'>
                 <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
                 <button onClick={suivantMobile} className='btnSuivantChoix'> Suivant <BsChevronDoubleRight /> </button>
@@ -390,51 +393,51 @@ export default function TrouverFilm() {
           {divVisibleMobile === "divChoixDateFilmMobile" && (
             <div id='divChoixDateFilmMobile'>
               <div className='btnSelecFilmMobile'>
-              {[{ debut: 0, fin: 1979 }].map((tranche, index) => (
-                    <button
-                      key={index}
-                      onClick={() => choisirTrancheDate(tranche)}
-                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-                    >
-                      Sortie avant 1980
-                    </button>
-                  ))}
-                  {[{ debut: 1980, fin: 1999 }].map((tranche, index) => (
-                    <button
-                      key={index}
-                      onClick={() => choisirTrancheDate(tranche)}
-                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-                    >
-                      Sortie : 1980 - 1999
-                    </button>
-                  ))}
-                  {[{ debut: 2000, fin: 2009 }].map((tranche, index) => (
-                    <button
-                      key={index}
-                      onClick={() => choisirTrancheDate(tranche)}
-                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-                    >
-                      Sortie : 2000 - 2009
-                    </button>
-                  ))}
-                  {[{ debut: 2010, fin: 2019 }].map((tranche, index) => (
-                    <button
-                      key={index}
-                      onClick={() => choisirTrancheDate(tranche)}
-                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-                    >
-                      Sortie : 2010 - 2019
-                    </button>
-                  ))}
-                  {[{ debut: 2020, fin: Infinity }].map((tranche, index) => (
-                    <button
-                      key={index}
-                      onClick={() => choisirTrancheDate(tranche)}
-                      className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
-                    >
-                      Sortie après 2019
-                    </button>
-                  ))}
+                {[{ debut: 0, fin: 1979 }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDate(tranche)}
+                    className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                  >
+                    Sortie avant 1980
+                  </button>
+                ))}
+                {[{ debut: 1980, fin: 1999 }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDate(tranche)}
+                    className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                  >
+                    Sortie : 1980 - 1999
+                  </button>
+                ))}
+                {[{ debut: 2000, fin: 2009 }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDate(tranche)}
+                    className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                  >
+                    Sortie : 2000 - 2009
+                  </button>
+                ))}
+                {[{ debut: 2010, fin: 2019 }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDate(tranche)}
+                    className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                  >
+                    Sortie : 2010 - 2019
+                  </button>
+                ))}
+                {[{ debut: 2020, fin: Infinity }].map((tranche, index) => (
+                  <button
+                    key={index}
+                    onClick={() => choisirTrancheDate(tranche)}
+                    className={`btnChoix ${isTrancheDateSelected(tranche) ? 'selectedFilm' : 'unselected'}`}
+                  >
+                    Sortie après 2019
+                  </button>
+                ))}
               </div>
               <div className='divBtnChoixMobile'>
                 <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
@@ -446,17 +449,27 @@ export default function TrouverFilm() {
           {divVisibleMobile === "divChoixScoreFilmMobile" && (
             <div id='divChoixScoreFilmMobile'>
               <div className='btnSelecFilmMobile'>
-              {noteUnique.map((note, index) => {
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => choisirNote(note)}
-                        className={`btnChoix ${choixNote.includes(note) ? 'selectedFilm' : 'unselected'}`}
-                      >
-                        {note} <RiStarFill />
-                      </button>
-                    );
-                  })}
+                {[
+                  { debut: 0, fin: 1.9, label: 1 },
+                  { debut: 2, fin: 2.9, label: 2 },
+                  { debut: 3, fin: 3.9, label: 3 },
+                  { debut: 4, fin: 4.9, label: 4 },
+                  { debut: 5, fin: 5, label: 5 }
+                ].map((tranche) => (
+                  <button
+                    key={tranche.label}
+                    onClick={() => {
+                      choisirTrancheNote(tranche)
+                    }}
+                    className={`btnChoix ${(() => {
+                      const isSelected = isTrancheNoteSelected(tranche);
+                      return isSelected ? 'selectedFilm' : 'unselected';
+                    })()
+                      }`}
+                  >
+                    {tranche.label} <RiStarFill />
+                  </button>
+                ))}
               </div>
               <div className='divBtnChoixMobile'>
                 <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
@@ -478,40 +491,49 @@ export default function TrouverFilm() {
                         <div className='movieImg' style={{ "--bg-image-movie": `url(${selectedRandomFilm.poster_url})` }}></div>
                         <div className='cardInfoText'>
                           <div className='mr-grid'>
-                            <h1>{selectedRandomFilm.titre}</h1>
-                            <div className='col1 genreDuree'>
-                              <p className='filmCardGenre'>
-                                {selectedRandomFilm.genres.join(", ")}
-                              </p>
-                              {selectedRandomFilm.duree_minutes === null ? (
+                            <h1>{selectedRandomFilm.title}</h1>
+                            <div className=' d-flex col1 duree'>
+                              {selectedRandomFilm.runtime === null ? (
                                 <p className='dureeCardFilm'>Durée non renseignée</p>
                               ) : (
                                 <p className='dureeCardFilm'>
-                                  {convertMinutesToHoursMinutes(selectedRandomFilm.duree_minutes)}
+                                  {convertMinutesToHoursMinutes(selectedRandomFilm.runtime)}
                                 </p>
                               )}
                               <p className='noteFilmCard'>
-                                {selectedRandomFilm.note_user} <span><RiStarFill /></span>
+                                {selectedRandomFilm.vote_average > 0 ? (
+                                  <>{selectedRandomFilm.vote_average.toFixed(1)} < span > <RiStarFill /></span></>
+                                )
+                                  : (
+                                    <p>Aucune évalutation</p>
+                                  )}
                               </p>
                             </div>
                             <div className='mr-grid'>
                               <div className='col1'>
                                 <div className='filmCardDesc'>
                                   <FilmDescription
-                                    synopsis={selectedRandomFilm.synopsis}
-                                    acteurs={selectedRandomFilm.acteurs}
-                                    realisateur={selectedRandomFilm.realisateur}
+                                    synopsis={selectedRandomFilm.overview}
+                                    acteurs={selectedRandomFilm.actors}
+                                    realisateur={selectedRandomFilm.directors}
                                   />
                                 </div>
                               </div>
                             </div>
                             <div className='d-flex'>
-                              <div>
-                                <i></i>
-                              </div>
                               <div className='dateSortieCard'>
-                                Date de sortie : {selectedRandomFilm.date_sortie}
+                                Date de sortie : {selectedRandomFilm.releaseYear}
                               </div>
+                            </div>
+                            <div className='genreDiv'>
+                              {selectedRandomFilm.genres.length > 0 ? (
+                                <p className='filmCardGenre'>
+                                  {selectedRandomFilm.genres.join(", ")}
+                                </p>
+                              ) : (
+                                <p className='filmCardGenre'>Genres : information non disponible</p>
+                              )}
+
                             </div>
                           </div>
                         </div>
@@ -520,7 +542,7 @@ export default function TrouverFilm() {
                   </div>
                 </div>
               ) : (
-                <div className='noFilmDiv'>Aucun film trouvé avec les filtres sélectionnés.</div>
+                <div className='noFilmDiv text-white'>Aucun film trouvé avec les filtres sélectionnés.</div>
               )}
               <div className='divBtnChoix d-flex justify-content-around'>
                 <button onClick={retourMobile} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
@@ -692,26 +714,38 @@ export default function TrouverFilm() {
                   <h2>Note : </h2>
                   {filtres.note.length > 0 ? (
                     <ul>
-                      {filtres.note.map((note, index) => {
-                        return <li key={index}> {note} <RiStarFill /> </li>
-                      })}
+                      {filtres.note.sort((a, b) => a.debut - b.debut).map((tranche, index) => (
+                        <li key={index}>
+                          {tranche.debut} - {tranche.fin} <RiStarFill />
+                        </li>
+                      ))}
                     </ul>
                   ) : (
                     <p>Selectionnez un ou plusieurs filtres</p>
                   )}
                 </div>
                 <div className='divBtnSelecFilm'>
-                  {noteUnique.map((note, index) => {
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => choisirNote(note)}
-                        className={`btnChoix ${choixNote.includes(note) ? 'selectedFilm' : 'unselected'}`}
-                      >
-                        {note} <RiStarFill />
-                      </button>
-                    );
-                  })}
+                  {[
+                    { debut: 0, fin: 1.9, label: 1 },
+                    { debut: 2, fin: 2.9, label: 2 },
+                    { debut: 3, fin: 3.9, label: 3 },
+                    { debut: 4, fin: 4.9, label: 4 },
+                    { debut: 5, fin: 5, label: 5 }
+                  ].map((tranche) => (
+                    <button
+                      key={tranche.label}
+                      onClick={() => {
+                        choisirTrancheNote(tranche)
+                      }}
+                      className={`btnChoix ${(() => {
+                        const isSelected = isTrancheNoteSelected(tranche);
+                        return isSelected ? 'selectedFilm' : 'unselected';
+                      })()
+                        }`}
+                    >
+                      {tranche.label} <RiStarFill />
+                    </button>
+                  ))}
                 </div>
               </div>
               <div className='divBtnChoix d-flex justify-content-around'>
@@ -734,39 +768,49 @@ export default function TrouverFilm() {
                     <div className='movieImg' style={{ "--bg-image-movie": `url(${selectedRandomFilm.poster_url})` }}></div>
                     <div className='cardInfoText'>
                       <div className='mr-grid'>
-                        <h1>{selectedRandomFilm.titre}</h1>
-                        <div className='col1 genreDuree'>
-                          <p className='filmCardGenre'>
-                            {selectedRandomFilm.genres.join(", ")}
-                          </p>
-                          {selectedRandomFilm.duree_minutes === null ? (
+                        <h1>{selectedRandomFilm.title}</h1>
+                        <div className=' d-flex col1 duree'>
+                          {selectedRandomFilm.runtime === null ? (
                             <p className='dureeCardFilm'>Durée non renseignée</p>
                           ) : (
                             <p className='dureeCardFilm'>
-                              {convertMinutesToHoursMinutes(selectedRandomFilm.duree_minutes)}
+                              {convertMinutesToHoursMinutes(selectedRandomFilm.runtime)}
                             </p>
                           )}
                           <p className='noteFilmCard'>
-                            {selectedRandomFilm.note_user} <span><RiStarFill /></span>
+                            {selectedRandomFilm.vote_average > 0 ? (
+                              <>{selectedRandomFilm.vote_average.toFixed(1)} < span > <RiStarFill /></span></>
+                            )
+                              : (
+                                <p>Aucune évalutation</p>
+                              )}
                           </p>
                         </div>
                         <div className='mr-grid'>
                           <div className='col1'>
                             <div className='filmCardDesc'>
                               <FilmDescription
-                                synopsis={selectedRandomFilm.synopsis}
-                                acteurs={selectedRandomFilm.acteurs}
-                                realisateur={selectedRandomFilm.realisateur}
-                                date_sortie={selectedRandomFilm.date_sortie}
+                                synopsis={selectedRandomFilm.overview}
+                                acteurs={selectedRandomFilm.actors}
+                                realisateur={selectedRandomFilm.directors}
                               />
                             </div>
                           </div>
                         </div>
                         <div className='d-flex'>
-                          <div>
-                            <i></i>
+                          <div className='dateSortieCard'>
+                            Date de sortie : {selectedRandomFilm.releaseYear}
                           </div>
-                         
+                        </div>
+                        <div className='genreDiv'>
+                          {selectedRandomFilm.genres.length > 0 ? (
+                            <p className='filmCardGenre'>
+                              {selectedRandomFilm.genres.join(", ")}
+                            </p>
+                          ) : (
+                            <p className='filmCardGenre'>Genres : information non disponible</p>
+                          )}
+
                         </div>
                       </div>
                     </div>
@@ -775,7 +819,7 @@ export default function TrouverFilm() {
               </div>
             </div>
           ) : (
-            <div className='noFilmDiv' style={{ color : "white"}}>Aucun film trouvé avec les filtres sélectionnés.</div>
+            <div className='noFilmDiv text-white'>Aucun film trouvé avec les filtres sélectionnés.</div>
           )}
           <div className='divBtnChoix d-flex justify-content-around'>
             <button onClick={retour} className='btnRetourChoix'><BsChevronDoubleLeft /> Retour</button>
